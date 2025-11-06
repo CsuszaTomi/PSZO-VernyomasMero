@@ -10,5 +10,21 @@ namespace MyApp
         {
             Console.WriteLine("Hello World!");
         }
+    }   
+
+    /// <summary>
+    /// A FELHASZNÁLÓ ÉS ANNAK ADATAI
+    /// </summary>
+    internal class User
+    {
+
+    }
+
+    /// <summary>
+    /// A VÉRNYOMÁS ADATAIT TÁROLJA(MÉRÉS IDEJE,EREDMÉNYE,ALANY)
+    /// </summary>
+    internal class BpStore//BloodPressureStore
+    {
+
     }
 }
