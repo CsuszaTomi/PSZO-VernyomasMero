@@ -1,0 +1,32 @@
+﻿Vérnyomásnapló
+A feladat egy vérnyomásnapló és kiértékelő alkalmazás elkészítése C# -ban.
+A program feladata, funkciói:
+* Több felhasználó vérnyomásadatainak rögzítését tegye lehetővé (pl. alkalmas szerkezetű szöveges állományban). Dátum, felhasználó és érték kötelező, egyéb adat opcionális.
+* A felhasználók személyes adatait is tárolja. Név, születési dátum kötelező, egyéb adat opcionális.
+* A felhasználói felület könnyen kezelhető legyen (vagyis a lehető legkevesebbet kelljen pl. gépelni, áttekinthető legyen stb.)
+* Segítse a rögzített adatok elemzését, vagyis felhasználónként és összesítve is le lehessen kérdezni, hogy
+   * hány vérnyomás adat esik egy-egy kategóriába (normál, emelkedett stb.)
+   * mi a legmagasabb és a legalacsonyabb érték
+   * mely felhasználóknak van adott %-nál több esetben magas vagy alacsony a vérnyomása
+* Egyéb funkciókkal kiegészíthető.
+
+
+Fejlesztés és munkamegosztás
+Készíteni kell egy fejlesztési tervet valamilyen projektmunka-felületen (Trello vagy GitHub Project), amiben az egyes feladatok, lépések, határidők, felelősök megjelennek. Ez mérföldkövek kijelölését jelenti → egy mérföldkövet előírok: az első alkalommal (11.06.) el kell készülnie és jóvá kell hagynom a projekt felosztását és a munkamegosztást, vagyis a projekttervet.
+Törekedni kell a párhuzamos fejlesztésre, vagyis külön branch-ekbe kell szervezni a fő funkciók fejlesztését. A visszakövethetőség miatt javasolt a merge az ágak egyesítésére.
+(A következő három mappát helytakarékosságból vegyétek fel a gitignore állományba
+ /.vs
+/obj
+/bin)
+A fejlesztett alkalmazáshoz készüljön dokumentáció:
+* dokumentációs kommentek
+* felhasználói dokumentáció
+* a fejlesztés egyes lépéseinek dokumentálása (ki, mikor, mit, milyen előírást/funkciót valósít meg innentől a program)  A tanult agilis fejlesztési módszert (Scrum) alkalmazzátok → vázlatosan dokumentáljátok az egyes sprinteket, megbeszéléseket (pl. 11.07. állapot és feladatok: Pista fejleszti az adatok rögzítéséért felelős részt – megbeszéltük, hogy az állomány egyes sorai milyen adatokat tartalmaznak és az elválasztó a pontosvessző – Géza elkészítette a vérnyomásbetegek leválogatását, teszteljük stb.)
+* prezentáció → a védéshez
+formájában.
+A rögzített adatokat is fel kell tölteni a repositoryba.
+Az elkészült kód publikus GitHub repository linkjét kell leadni, ahol egyértelműen ki kell derülnie, ki milyen részt készített.
+Egyéb
+A fejlesztés nem öncélú, vagyis a témát meg kell ismerni → utánanézni, mit lehet tudni a vérnyomásról, ezt a védés prezentációjába is építsétek be! Szintén ide kell feltüntetni a forrásokat → szakmailag (orvosilag) hiteles forrást kell használni (a vajákos Biri néne ebből a szempontból nem felel meg).
+Több lehet, de legyen kész. Pl. szerencsés, ha többfelhasználós üzemmódban gondolkodunk, de ez ne menjen a kötelezők rovására!
+Értsd a kódot! A fejlesztést felgyorsítja az AI használata, de a tervezés előbbrevaló → kisebb részfeladatokra hasznos igazán az AI. Az asztali alkalmazás órákon tanultak (algoritmusok, adatszerkezetek, megfelelő típusok stb.) jelenjenek meg a kódban! Arra gondolj, hogy nem csak a feladat kipipálása, hanem a saját tudásod bemutatása is cél.
