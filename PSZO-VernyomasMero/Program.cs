@@ -10,20 +10,77 @@ using System.Net.Http;
 using System.Reflection.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
-
-namespace MyApp
+ 
+namespace PSZO_VernyomasMero
 {
     internal class Program
     {
         static void Main(string[] args)
         {
-            User.CollectUserData();
-            string UserName, FullName, Password, Gender;
-            DateTime BirthDate;
-            RegisterUser(out UserName, out FullName, out Password, out BirthDate, out Gender);
-            User.AddUser(UserName, FullName, Password, BirthDate, Gender);
-            User.ShowUsers();
-            User.SaveUserData();
+            while (true)
+            {
+                Console.Clear();
+                int choice = 0;
+                Console.WriteLine("1.Regisztrálás");
+                Console.WriteLine("2. Bejelentkezés");
+                choice = int.Parse(Console.ReadLine());
+                User.CollectUserData();
+                string UserName, FullName, Password, Gender;
+                DateTime BirthDate;
+                if (choice == 1)
+                {
+                    Console.Clear();
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("Regisztráció");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    do
+                    {
+                        RegisterUser(out UserName, out FullName, out Password, out BirthDate, out Gender);
+                    } while (!User.ValidateUserData(UserName, FullName, Password, BirthDate, Gender));
+                    User.AddUser(UserName, FullName, Password, BirthDate, Gender);
+                    User.ShowUsers();
+                    User.SaveUserData();
+                }
+                else if (choice == 2)
+                {
+                    Console.Clear();
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("Bejelentkezés");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write("Adja meg a felhasználó nevét: ");
+                    string LoginUserName = Console.ReadLine();
+                    Console.Write("Adja meg a jelszavát: ");
+                    string LoginPassword = Console.ReadLine();
+                    int check = 0;
+                    for (int i = 0; i < User.Users.Count; i++)
+                    {
+                        if (User.Users[i].UserName == LoginUserName && User.Users[i].Password == LoginPassword)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine("Sikeres bejelentkezés!");
+                            Console.ForegroundColor = ConsoleColor.White;
+                            Thread.Sleep(2000);
+                            break;
+                        }
+                        else
+                        {
+                            check++;
+                            if (check == User.Users.Count)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("Sikertelen bejelentkezés!");
+                                Console.ForegroundColor = ConsoleColor.White;
+                                Thread.Sleep(2000);
+                                break;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Nincs ilyen menüpont!");
+                }
+            }
 
             static void RegisterUser(out string UserName, out string FullName, out string Password, out DateTime BirthDate, out string Gender)
             {
@@ -114,15 +171,42 @@ namespace MyApp
         //user adatok ellenörzése hogy nem semmit írt e be
         public static bool ValidateUserData(string userName, string fullName, string password, DateTime birth, string gender)
         {
-            if (string.IsNullOrEmpty(userName) && string.IsNullOrEmpty(fullName) && string.IsNullOrEmpty(password) && string.IsNullOrEmpty(birth.ToString()) && string.IsNullOrEmpty(gender))
+            if (string.IsNullOrWhiteSpace(userName))
             {
-                return true;
-            }
-            else
-            {
-                Console.WriteLine("Nem adott meg minden adatot!");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("A felhasználónév nem lehet üres!");
+                Console.ForegroundColor = ConsoleColor.White;
                 return false;
             }
+            if (string.IsNullOrWhiteSpace(fullName))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("A teljes név nem lehet üres!");
+                Console.ForegroundColor = ConsoleColor.White;
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("A jelszó nem lehet üres!");
+                Console.ForegroundColor = ConsoleColor.White;
+                return false;
+            }
+            if (birth > DateTime.Now)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("A születési dátum nem lehet a jövőben!");
+                Console.ForegroundColor = ConsoleColor.White;
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(gender) || !(gender.ToLower() == "férfi" || gender.ToLower() == "nő"))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("A nem csak 'Férfi' vagy 'Nő' lehet!");
+                Console.ForegroundColor = ConsoleColor.White;
+                return false;
+            }
+            return true;
         }
 
         //user adatainak fájlba írása
@@ -137,11 +221,12 @@ namespace MyApp
                 Console.WriteLine("Nincs UserData.txt fájl a projekt mappában!");
                 return;
             }
-            for (int i = 0; i < Users.Count; i++)
+            List<string> UsersOutput = new List<string>();
+            foreach (var user in Users)
             {
-                string Output = $"{Users[i].UserName};{Users[i].FullName};{Users[i].Password};{Users[i].BirthDate.ToShortDateString()};{Users[i].Gender}";
-                File.AppendAllText(filePath,Output + Environment.NewLine);
+                UsersOutput.Add($"{user.UserName};{user.FullName};{user.Password};{user.BirthDate.ToShortDateString()};{user.Gender}");
             }
+            File.WriteAllLines(filePath, UsersOutput);
         }
     }
     /// <summary>
