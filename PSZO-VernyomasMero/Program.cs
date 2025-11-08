@@ -1,4 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
+// See https://aka.ms/new-console-template for more information
 
 using System;
 using System;
@@ -9,8 +9,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection.Metadata;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
- 
+
 namespace PSZO_VernyomasMero
 {
     internal class Program
@@ -108,8 +109,83 @@ namespace PSZO_VernyomasMero
                 Console.Write("Adja meg a nemét (Férfi/Nő): ");
                 Gender = Console.ReadLine();
             }
+
+            static void CreateBpSave(string userName)
+            { 
+                string bloodPressureLevel = "";
+                DateTime date;
+
+                Console.Write("dátum --> ");
+                date = DateTime.Parse(Console.ReadLine());
+
+                Console.Write("vérnyomás --> ");
+                bloodPressureLevel = Console.ReadLine();
+
+                BpStore newBpData = new BpStore(userName, date, bloodPressureLevel);
+                newBpData.SaveBpData();
+            }
+
+            static string[] ReadBpData(string userName = "")
+            {
+                if (userName != "")
+                {
+                    List<string> lines = new List<string>();
+
+                    using (StreamReader sr = new StreamReader("BpData.txt"))
+                    {
+                        string line;
+
+                        while ((line = sr.ReadLine()) != null)
+                        {
+                            if (line.Split(';')[0] == userName)
+                            {
+                                lines.Add(line);
+                            }
+                        }
+                    }
+
+                    return lines.ToArray();
+                }
+                else
+                {                  
+                    string basePath = AppDomain.CurrentDomain.BaseDirectory;
+                    string projectPath = Path.GetFullPath(Path.Combine(basePath, @"..\..\.."));
+                    string filePath = Path.Combine(projectPath, "BpData.txt");
+
+                    string[] lines = File.ReadAllLines(filePath);
+
+                    return lines;
+                }
+            }
         }
     }
+
+    /// <summary>
+    /// A VÉRNYOMÁS ADATAIT TÁROLJA(MÉRÉS IDEJE,EREDMÉNYE, qANY)
+    /// </summary>
+    internal class BpStore//BloodPressureStore
+    {
+        public string user;
+        public DateTime date;
+        public string bpLevel;
+
+        public void SaveBpData()
+        {
+            string basePath = AppDomain.CurrentDomain.BaseDirectory;
+            string projectPath = Path.GetFullPath(Path.Combine(basePath, @"..\..\.."));
+            string filePath = Path.Combine(projectPath, "BpData.txt");
+
+            File.AppendAllText(filePath, $"{user};{date.ToString()};{bpLevel}\n");
+        }
+
+        public BpStore(string user, DateTime date, string bpLevel)
+        {
+            this.user = user;
+            this.date = date;
+            this.bpLevel = bpLevel;
+        }
+    }
+
     /// <summary>
     /// A FELHASZNÁLÓ ÉS ANNAK ADATAI
     /// </summary>
@@ -227,15 +303,7 @@ namespace PSZO_VernyomasMero
                 UsersOutput.Add($"{user.UserName};{user.FullName};{user.Password};{user.BirthDate.ToShortDateString()};{user.Gender}");
             }
             File.WriteAllLines(filePath, UsersOutput);
+
         }
     }
-    /// <summary>
-    /// A VÉRNYOMÁS ADATAIT TÁROLJA(MÉRÉS IDEJE,EREDMÉNYE, qANY)
-    /// </summary>
-    internal class BpStore//BloodPressureStore
-    {
-
-    }
-
-    
 }
