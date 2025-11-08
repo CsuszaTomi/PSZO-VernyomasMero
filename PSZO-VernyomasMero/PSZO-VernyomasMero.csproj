@@ -9,6 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Update="BpData.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="UserData.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

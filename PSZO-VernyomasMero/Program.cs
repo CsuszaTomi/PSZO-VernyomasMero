@@ -61,7 +61,44 @@ namespace PSZO_VernyomasMero
                             Console.WriteLine("Sikeres bejelentkezés!");
                             Console.ForegroundColor = ConsoleColor.White;
                             Thread.Sleep(2000);
-                            break;
+                            bool exit = false;
+                            while (!exit)
+                            {
+                                Console.Clear();
+                                Console.WriteLine($"Üdvözöljük, {LoginUserName}!");
+                                Console.WriteLine("1. Vérnyomás rögzítése");
+                                Console.WriteLine("2. Saját mérések megtekintése");
+                                Console.WriteLine("3. Kijelentkezés");
+
+                                Console.Write("Válasszon: ");
+                                string choice2 = Console.ReadLine();
+
+                                switch (choice2)
+                                {
+                                    case "1":
+                                        CreateBpSave(LoginUserName);
+                                        Console.WriteLine("Vérnyomásadat elmentve!");
+                                        Thread.Sleep(2000);
+                                        break;
+                                    case "2":
+                                        var bpuserdata = ReadBpData(LoginUserName);
+                                        Console.WriteLine("\nSaját mérései:");
+                                        foreach (var item in bpuserdata)
+                                        {
+                                            Console.WriteLine(item);
+                                        }
+                                        Console.WriteLine("\nNyomjon ENTER-t a folytatáshoz...");
+                                        Console.ReadLine();
+                                        break;
+                                    case "3":
+                                        exit = true;
+                                        break;
+                                    default:
+                                        Console.WriteLine("Nincs ilyen menüpont!");
+                                        Thread.Sleep(1500);
+                                        break;
+                                }
+                            }
                         }
                         else
                         {
@@ -169,13 +206,13 @@ namespace PSZO_VernyomasMero
         public DateTime date;
         public string bpLevel;
 
+        //vérnyomás adatainak fájlba írása
         public void SaveBpData()
         {
             string basePath = AppDomain.CurrentDomain.BaseDirectory;
             string projectPath = Path.GetFullPath(Path.Combine(basePath, @"..\..\.."));
             string filePath = Path.Combine(projectPath, "BpData.txt");
-
-            File.AppendAllText(filePath, $"{user};{date.ToString()};{bpLevel}\n");
+            File.AppendAllText(filePath, $"{user};{date.ToShortDateString()};{bpLevel}\n");
         }
 
         public BpStore(string user, DateTime date, string bpLevel)
