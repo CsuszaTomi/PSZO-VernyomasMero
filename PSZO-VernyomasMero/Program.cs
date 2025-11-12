@@ -22,8 +22,15 @@ namespace PSZO_VernyomasMero
             {
                 Console.Clear();
                 int choice = 0;
-                Console.WriteLine("1.Regisztrálás");
-                Console.WriteLine("2. Bejelentkezés");
+                Console.ForegroundColor = ConsoleColor.Red;
+                WriteLineCentered("=== VÉRNYOMÁSNAPLÓ ===");
+                Console.ForegroundColor = ConsoleColor.White;
+                WriteLineCentered("-------------------");
+                WriteLineCentered("1. Regisztrálás");
+                WriteLineCentered("2. Bejelentkezés");
+                WriteLineCentered("3. Kilépés");
+                WriteLineCentered("--------------------");
+                WriteCentered("Válasszon ki egy menüpontot: ");
                 choice = int.Parse(Console.ReadLine());
                 User.CollectUserData();
                 string UserName, FullName, Password, Gender;
@@ -32,7 +39,7 @@ namespace PSZO_VernyomasMero
                 {
                     Console.Clear();
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine("Regisztráció");
+                    WriteLineCentered("=== REGISZTRÁCIÓ === ");
                     Console.ForegroundColor = ConsoleColor.White;
                     do
                     {
@@ -46,11 +53,12 @@ namespace PSZO_VernyomasMero
                 {
                     Console.Clear();
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine("Bejelentkezés");
+                    WriteLineCentered("=== BEJELENTKEZÉS ===");
                     Console.ForegroundColor = ConsoleColor.White;
-                    Console.Write("Adja meg a felhasználó nevét: ");
+                    Console.WriteLine(" ");
+                    WriteCentered("Adja meg a felhasználó nevét: ");
                     string LoginUserName = Console.ReadLine();
-                    Console.Write("Adja meg a jelszavát: ");
+                    WriteCentered("Adja meg a jelszavát: ");
                     string LoginPassword = Console.ReadLine();
                     int check = 0;
                     for (int i = 0; i < User.Users.Count; i++)
@@ -58,44 +66,44 @@ namespace PSZO_VernyomasMero
                         if (User.Users[i].UserName == LoginUserName && User.Users[i].Password == LoginPassword)
                         {
                             Console.ForegroundColor = ConsoleColor.Green;
-                            Console.WriteLine("Sikeres bejelentkezés!");
+                            WriteLineCentered("Sikeres bejelentkezés!");
                             Console.ForegroundColor = ConsoleColor.White;
                             Thread.Sleep(2000);
                             bool exit = false;
                             while (!exit)
                             {
                                 Console.Clear();
-                                Console.WriteLine($"Üdvözöljük, {LoginUserName}!");
-                                Console.WriteLine("1. Vérnyomás rögzítése");
-                                Console.WriteLine("2. Saját mérések megtekintése");
-                                Console.WriteLine("3. Kijelentkezés");
-
-                                Console.Write("Válasszon: ");
+                                WriteLineCentered($"Üdvözöljük, {LoginUserName}!");
+                                WriteLineCentered("--------------------");
+                                WriteLineCentered("1. Vérnyomás rögzítése");
+                                WriteLineCentered("2. Saját mérések megtekintése");
+                                WriteLineCentered("3. Kijelentkezés");
+                                WriteLineCentered("--------------------");
+                                WriteCentered("Válasszon: ");
                                 string choice2 = Console.ReadLine();
-
                                 switch (choice2)
                                 {
                                     case "1":
                                         CreateBpSave(LoginUserName);
-                                        Console.WriteLine("Vérnyomásadat elmentve!");
+                                        WriteLineCentered("Vérnyomásadat elmentve!");
                                         Thread.Sleep(2000);
                                         break;
                                     case "2":
                                         var bpuserdata = ReadBpData(LoginUserName);
-                                        Console.WriteLine("\nSaját mérései:");
+                                        WriteLineCentered("\nSaját mérései:");
                                         foreach (var item in bpuserdata)
                                         {
-                                            Console.WriteLine(item);
+                                            WriteLineCentered(item);
                                         }
-                                        Console.WriteLine("\nNyomjon ENTER-t a folytatáshoz...");
+                                        WriteLineCentered("\nNyomjon ENTER-t a folytatáshoz...");
                                         Console.ReadLine();
                                         break;
                                     case "3":
                                         exit = true;
                                         break;
                                     default:
-                                        Console.WriteLine("Nincs ilyen menüpont!");
-                                        Thread.Sleep(1500);
+                                        WriteLineCentered("Nincs ilyen menüpont!");
+                                        Thread.Sleep(2000);
                                         break;
                                 }
                             }
@@ -106,7 +114,7 @@ namespace PSZO_VernyomasMero
                             if (check == User.Users.Count)
                             {
                                 Console.ForegroundColor = ConsoleColor.Red;
-                                Console.WriteLine("Sikertelen bejelentkezés!");
+                                WriteLineCentered("Sikertelen bejelentkezés!");
                                 Console.ForegroundColor = ConsoleColor.White;
                                 Thread.Sleep(2000);
                                 break;
@@ -114,9 +122,13 @@ namespace PSZO_VernyomasMero
                         }
                     }
                 }
+                else if (choice == 3)
+                {
+                    Environment.Exit(0);
+                }
                 else
                 {
-                    Console.WriteLine("Nincs ilyen menüpont!");
+                    WriteLineCentered("Nincs ilyen menüpont!");
                 }
             }
 
@@ -193,6 +205,27 @@ namespace PSZO_VernyomasMero
 
                     return lines;
                 }
+            }
+
+            /// <summary>
+            /// A függvény a Console.WriteLine középre íratását valósítja meg
+            /// </summary>
+            /// <param name="text">A megadott szöveget írja ki középre</param>
+            static void WriteLineCentered(string text)
+            // Console.WriteLine középre íratása
+            {
+                int width = Console.WindowWidth;
+                int leftPadding = (width - text.Length) / 2;
+                if (leftPadding < 0) leftPadding = 0;
+                Console.WriteLine(new string(' ', leftPadding) + text);
+            }
+            static void WriteCentered(string text)
+            // Console.Write középre íratása
+            {
+                int width = Console.WindowWidth;
+                int leftPadding = (width - text.Length) / 2;
+                if (leftPadding < 0) leftPadding = 0;
+                Console.Write(new string(' ', leftPadding) + text);
             }
         }
     }
