@@ -217,7 +217,8 @@ namespace PSZO_VernyomasMero
                     TextDecoration.WriteLineCentered("1. Vérnyomás rögzítése");
                     TextDecoration.WriteLineCentered("2. Saját mérések megtekintése");
                     TextDecoration.WriteLineCentered("3. Statisztikák");
-                    TextDecoration.WriteLineCentered("4. Kijelentkezés");
+                    TextDecoration.WriteLineCentered("3. Beállítások");
+                    TextDecoration.WriteLineCentered("5. Kijelentkezés");
                     TextDecoration.WriteLineCentered("--------------------");
                     TextDecoration.WriteCentered("Válasszon: ");
                     string choice2 = Console.ReadLine();
@@ -251,6 +252,10 @@ namespace PSZO_VernyomasMero
                             Thread.Sleep(2000);
                             break;
                         case "4":
+                            Console.Clear();
+                            Settings.SettingsMenu();
+                            continue;
+                        case "5":
                             exit = true;
                             break;
                         default:
