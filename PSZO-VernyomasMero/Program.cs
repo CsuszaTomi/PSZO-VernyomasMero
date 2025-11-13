@@ -233,7 +233,7 @@ namespace PSZO_VernyomasMero
                             Thread.Sleep(4000);
                             break;
                         case "2":
-                            var bpuserdata = ReadBpData(LoginUserName);
+                            var bpuserdata = BpStore.ReadBpData(LoginUserName);
                             TextDecoration.WriteLineCentered("Saját mérései:");
                             foreach (var item in bpuserdata)
                             {
@@ -407,7 +407,7 @@ namespace PSZO_VernyomasMero
             return "";
         }
 
-        static string[] ReadBpData(string userName = "")
+        public static string[] ReadBpData(string userName = "")
         {
             if (userName != "")
             {
