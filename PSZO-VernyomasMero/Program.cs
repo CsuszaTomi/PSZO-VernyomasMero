@@ -180,7 +180,7 @@ namespace PSZO_VernyomasMero
             }
 
 
-            static void CreateBpSave(string userName)
+            static void RegisterBP(string userName)
             { 
                 string bloodPressureLevel = "";
                 DateTime date;
@@ -196,92 +196,6 @@ namespace PSZO_VernyomasMero
 
                 BpStore newBpData = new BpStore(userName, date, sys, dia, pul);
                 newBpData.SaveBpData();
-            }
-
-            static string InspectBP(DateTime birthDate, int sys, int diast, int bpm)
-            {
-                // KISZÁMOLJUK AZ ÉLETKORÁT
-                int age = DateTime.Now.Year - birthDate.Year;
-                int sysMin = 0;
-                int sysMax = 0;
-                int diastMin = 0;                
-                int diastMax = 0;
-                int bpmMin = 60;
-                int bpmMax = 100;
-            
-                string sysStatus = "";
-                string diastStatus = "";
-                string bpmStatus = "";
-            
-                if (0 <= age && age <= 18)
-                {
-                    sysMin = 75;
-                    sysMax = 113;
-            
-                    diastMin = 45;
-                    diastMax = 74;
-                }
-                else if (18 < age && age >= 60)
-                {
-                    sysMin = 105;
-                    sysMax = 125;
-            
-                    diastMin = 60;
-                    diastMax = 80;
-                }
-                else
-                {
-                    sysMin = 105;
-                    sysMax = 133;
-            
-                    diastMin = 60;
-                    diastMax = 83;
-                }
-            
-                // VIZSGÁLJUK A SZISZTOLIKUS ÉRTÉKET
-                if (sysMin <= sys && sys <= sysMax)
-                {
-                    sysStatus = "normális";
-                }
-                else if (sys < sysMin) 
-                {
-                    sysStatus = "alacsony";
-                }
-                else
-                {
-                    sysStatus = "magas";
-                }
-            
-                // VIZSGÁLJUK A DIASZTOLIKUS ÉRTÉKET
-                if (diastMin <= diast && diast <= diastMax)
-                {
-                    diastStatus = "normális";
-                }
-                else if (diast < diastMin)
-                {
-                    diastStatus = "alacsony";
-                }
-                else
-                {
-                    diastStatus = "magas";
-                }
-            
-                // PULZUS VIZSGÁLAT
-                if (bpmMin <= bpm && bpm <= bpmMax)
-                {
-                    bpmStatus = "normális";   
-                }
-                else if (bpm < bpmMin)
-                {
-                    bpmStatus = "alacsony";
-                }
-                else
-                {
-                    bpmStatus = "magas";
-                }
-            
-                // SZISZTÓLIKUS_ÁLLAPOTA;DIASZTÓLIKUS_ÁLLAPOTA;PULZUS_ÁLLAPOTA
-                return $"{sysStatus};{diastStatus};{bpmStatus}";
             }
 
             static string[] ReadBpData(string userName = "")
@@ -335,7 +249,8 @@ namespace PSZO_VernyomasMero
                     TextDecoration.WriteLineCentered("--------------------");
                     TextDecoration.WriteLineCentered("1. Vérnyomás rögzítése");
                     TextDecoration.WriteLineCentered("2. Saját mérések megtekintése");
-                    TextDecoration.WriteLineCentered("3. Kijelentkezés");
+                    TextDecoration.WriteLineCentered("3. Statisztikák");
+                    TextDecoration.WriteLineCentered("4. Kijelentkezés");
                     TextDecoration.WriteLineCentered("--------------------");
                     TextDecoration.WriteCentered("Válasszon: ");
                     string choice2 = Console.ReadLine();
@@ -345,7 +260,7 @@ namespace PSZO_VernyomasMero
                             Console.Clear();
                             Console.ForegroundColor = ConsoleColor.Red;
                             TextDecoration.WriteLineCentered("=== VÉRNYOMÁS RÖGZÍTÉSE ===", false);
-                            CreateBpSave(LoginUserName);
+                            RegisterBP(LoginUserName);
                             Console.ForegroundColor = ConsoleColor.Green;
                             TextDecoration.WriteLineCentered("Vérnyomásadat elmentve!", false);
                             Thread.Sleep(2000);
@@ -361,6 +276,12 @@ namespace PSZO_VernyomasMero
                             Console.ReadLine();
                             break;
                         case "3":
+                            Console.Clear();
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            TextDecoration.WriteLineCentered("=== STATISZTIKÁK ===", false);
+                            BpStore.InspectBP(User.BirthDate, 120, 80, 70);
+                            break;
+                        case "4":
                             exit = true;
                             break;
                         default:
@@ -385,7 +306,9 @@ namespace PSZO_VernyomasMero
         public int dia;
         public int pulse;
 
-        //vérnyomás adatainak fájlba írása
+        /// <summary>
+        /// Vérnyomás adatainak fájlba mentése
+        /// </summary>
         public void SaveBpData()
         {
             string basePath = AppDomain.CurrentDomain.BaseDirectory;
@@ -393,7 +316,14 @@ namespace PSZO_VernyomasMero
             string filePath = Path.Combine(projectPath, "BpData.txt");
             File.AppendAllText(filePath, $"{user};{date.ToShortDateString()};{sys};{dia};{pulse}\n");
         }
-
+        /// <summary>
+        /// Vérnyomás adatainak összeállítása
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="date"></param>
+        /// <param name="sys"></param>
+        /// <param name="dia"></param>
+        /// <param name="pulse"></param>
         public BpStore(string user, DateTime date, int sys, int dia,int pulse)
         {
             this.user = user;
@@ -401,6 +331,99 @@ namespace PSZO_VernyomasMero
             this.sys = sys;
             this.dia = dia;
             this.pulse = pulse;
+        }
+        /// <summary>
+        /// Vérnyomás értékek vizsgálata és állapot visszaadása
+        /// </summary>
+        /// <param name="birthDate"></param>
+        /// <param name="sys"></param>
+        /// <param name="diast"></param>
+        /// <param name="bpm"></param>
+        /// <returns></returns>
+        public static string InspectBP(DateTime birthDate, int sys, int diast, int bpm)
+        {
+            // KISZÁMOLJUK AZ ÉLETKORÁT
+            int age = DateTime.Now.Year - birthDate.Year;
+            int sysMin = 0;
+            int sysMax = 0;
+            int diastMin = 0;
+            int diastMax = 0;
+            int bpmMin = 60;
+            int bpmMax = 100;
+
+            string sysStatus = "";
+            string diastStatus = "";
+            string bpmStatus = "";
+
+            if (0 <= age && age <= 18)
+            {
+                sysMin = 75;
+                sysMax = 113;
+
+                diastMin = 45;
+                diastMax = 74;
+            }
+            else if (18 < age && age >= 60)
+            {
+                sysMin = 105;
+                sysMax = 125;
+
+                diastMin = 60;
+                diastMax = 80;
+            }
+            else
+            {
+                sysMin = 105;
+                sysMax = 133;
+
+                diastMin = 60;
+                diastMax = 83;
+            }
+
+            // VIZSGÁLJUK A SZISZTOLIKUS ÉRTÉKET
+            if (sysMin <= sys && sys <= sysMax)
+            {
+                sysStatus = "normális";
+            }
+            else if (sys < sysMin)
+            {
+                sysStatus = "alacsony";
+            }
+            else
+            {
+                sysStatus = "magas";
+            }
+
+            // VIZSGÁLJUK A DIASZTOLIKUS ÉRTÉKET
+            if (diastMin <= diast && diast <= diastMax)
+            {
+                diastStatus = "normális";
+            }
+            else if (diast < diastMin)
+            {
+                diastStatus = "alacsony";
+            }
+            else
+            {
+                diastStatus = "magas";
+            }
+
+            // PULZUS VIZSGÁLAT
+            if (bpmMin <= bpm && bpm <= bpmMax)
+            {
+                bpmStatus = "normális";
+            }
+            else if (bpm < bpmMin)
+            {
+                bpmStatus = "alacsony";
+            }
+            else
+            {
+                bpmStatus = "magas";
+            }
+
+            // SZISZTÓLIKUS_ÁLLAPOTA;DIASZTÓLIKUS_ÁLLAPOTA;PULZUS_ÁLLAPOTA
+            return $"{sysStatus};{diastStatus};{bpmStatus}";
         }
     }
 
@@ -453,6 +476,16 @@ namespace PSZO_VernyomasMero
             {
                 Console.WriteLine($"Felhasználónév: {user.UserName}, Teljes név: {user.FullName}, Születési dátum: {user.BirthDate.ToShortDateString()}, Nem: {user.Gender}");
             }
+        }
+
+        public static string[] GetUserNames()
+        {
+            string[] Usernames = new string[Users.Count];
+            for (int i = 0; i < Users.Count; i++)
+            {
+                Usernames[i] = Users[i].UserName;
+            }
+            return Usernames;
         }
 
         /// <summary>
