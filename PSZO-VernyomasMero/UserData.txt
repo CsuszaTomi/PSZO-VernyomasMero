@@ -7,3 +7,5 @@ SZB1;Szilágyi Bálint;123;2008. 06. 07.;Férfi
 NImre;Németh Imre;Skibidi;2007. 12. 14.;Férfi
 Admin;Admin;123;2001. 11. 11.;Férfi
 admin;Admin;123;2000. 11. 11.;Férfi
+Férfi;Karcsi;123;2000. 11. 12.;Férfi
+feri;feri;feri;2001. 11. 11.;Férfi

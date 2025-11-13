@@ -336,28 +336,28 @@ namespace PSZO_VernyomasMero
                 Console.ForegroundColor = ConsoleColor.White;
                 return false;
             }
-            if (string.IsNullOrWhiteSpace(fullName))
+            else if (string.IsNullOrWhiteSpace(fullName))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 TextDecoration.WriteLineCentered("A teljes név nem lehet üres!");
                 Console.ForegroundColor = ConsoleColor.White;
                 return false;
             }
-            if (string.IsNullOrWhiteSpace(password))
+            else if (string.IsNullOrWhiteSpace(password))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 TextDecoration.WriteLineCentered("A jelszó nem lehet üres!");
                 Console.ForegroundColor = ConsoleColor.White;
                 return false;
             }
-            if (birth > DateTime.Now)
+            else if (birth > DateTime.Now)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 TextDecoration.WriteLineCentered("A születési dátum nem lehet a jövőben!");
                 Console.ForegroundColor = ConsoleColor.White;
                 return false;
             }
-            if (string.IsNullOrWhiteSpace(gender) || !(gender.ToLower() == "férfi" || gender.ToLower() == "nő"))
+            else if (string.IsNullOrWhiteSpace(gender) || !(gender.ToLower() == "férfi" || gender.ToLower() == "nő"))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 TextDecoration.WriteLineCentered("A nem csak 'Férfi' vagy 'Nő' lehet!");
