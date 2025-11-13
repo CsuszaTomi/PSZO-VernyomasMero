@@ -24,7 +24,7 @@ namespace PSZO_VernyomasMero
                 // Teszt1
                 Console.Clear();
                 int choice = 0;
-                Console.ForegroundColor = ConsoleColor.Red;
+                Console.ForegroundColor = ConsoleColor.DarkRed;
                 TextDecoration.WriteLineCentered("=== VÉRNYOMÁSNAPLÓ ===",false);
                 Console.ForegroundColor = ConsoleColor.White;
                 TextDecoration.WriteLineCentered("-------------------");
@@ -42,7 +42,7 @@ namespace PSZO_VernyomasMero
                 if (choice == 1)
                 {
                     Console.Clear();
-                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
                     TextDecoration.WriteLineCentered("=== REGISZTRÁCIÓ === ", false);
                     Console.ForegroundColor = ConsoleColor.White;
                     do
@@ -56,7 +56,7 @@ namespace PSZO_VernyomasMero
                 else if (choice == 2)
                 {
                     Console.Clear();
-                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
                     TextDecoration.WriteLineCentered("=== BEJELENTKEZÉS ===", false);
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.WriteLine(" ");
@@ -82,7 +82,7 @@ namespace PSZO_VernyomasMero
                             check++;
                             if (check == User.Users.Count)
                             {
-                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.ForegroundColor = ConsoleColor.DarkRed;
                                 TextDecoration.WriteLineCentered("Sikertelen bejelentkezés!", false);
                                 Console.ForegroundColor = ConsoleColor.White;
                                 Thread.Sleep(2000);
@@ -197,12 +197,13 @@ namespace PSZO_VernyomasMero
                 while (!exit)
                 {
                     Console.Clear();
-                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
                     TextDecoration.WriteLineCentered($"Üdvözöljük, {LoginUserName}!", false);
                     TextDecoration.WriteLineCentered("--------------------");
                     TextDecoration.WriteLineCentered("1. Vérnyomás rögzítése");
                     TextDecoration.WriteLineCentered("2. Saját mérések megtekintése");
-                    TextDecoration.WriteLineCentered("3. Kijelentkezés");
+                    TextDecoration.WriteLineCentered("3. Beállítások");
+                    TextDecoration.WriteLineCentered("4. Kijelentkezés");
                     TextDecoration.WriteLineCentered("--------------------");
                     TextDecoration.WriteCentered("Válasszon: ");
                     string choice2 = Console.ReadLine();
@@ -228,6 +229,10 @@ namespace PSZO_VernyomasMero
                             Console.ReadLine();
                             break;
                         case "3":
+                            Console.Clear();
+                            Settings.SettingsMenu();
+                            break;
+                        case "4":
                             exit = true;
                             break;
                         default:
@@ -485,7 +490,7 @@ namespace PSZO_VernyomasMero
             Console.ForegroundColor = ConsoleColor.White;
             TextDecoration.WriteLineCentered("-------------------");
             TextDecoration.WriteLineCentered("1. Téma kiválasztása");
-            TextDecoration.WriteLineCentered("2. Vissza a főmenübe");
+            TextDecoration.WriteLineCentered("2. Vissza");
             TextDecoration.WriteLineCentered("--------------------");
             TextDecoration.WriteCentered("Válasszon ki egy menüpontot: ");
             string settingsChoice = Console.ReadLine();
@@ -497,6 +502,8 @@ namespace PSZO_VernyomasMero
                 Console.ForegroundColor = ConsoleColor.White;
                 TextDecoration.WriteLineCentered("1. Fekete háttér, fehér betűszín");
                 TextDecoration.WriteLineCentered("2. Fehér háttér, fekete betűszín");
+                TextDecoration.WriteLineCentered("3. Sötétkék háttér, cián betűszín");
+                TextDecoration.WriteLineCentered("4.  háttér,  betűszín");
                 TextDecoration.WriteCentered("Válasszon Témát: ");
                 string bgColorInput = Console.ReadLine();
                 if (bgColorInput == "1")
@@ -521,6 +528,42 @@ namespace PSZO_VernyomasMero
                 {
                     Console.BackgroundColor = ConsoleColor.White;
                     fgcolor = "b";
+                    try
+                    {
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        TextDecoration.WriteLineCentered("Téma sikeresen megváltoztatva!", false);
+                    }
+                    catch
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        TextDecoration.WriteLineCentered("Nincs ilyen téma!", false);
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+                    Thread.Sleep(2000);
+                }
+                else if (bgColorInput == "3")
+                {
+                    Console.BackgroundColor = ConsoleColor.DarkBlue;
+                    fgcolor = "c";
+                    try
+                    {
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        TextDecoration.WriteLineCentered("Téma sikeresen megváltoztatva!", false);
+                    }
+                    catch
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        TextDecoration.WriteLineCentered("Nincs ilyen téma!", false);
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+                    Thread.Sleep(2000);
+                }
+                else if (bgColorInput == "4")
+                {
+                    Console.BackgroundColor = ConsoleColor.DarkGreen;
+                    fgcolor = "y";
                     try
                     {
                         Console.Clear();
@@ -566,6 +609,14 @@ namespace PSZO_VernyomasMero
             else if (fgcolor == "b")
             {
                 Console.ForegroundColor = ConsoleColor.Black;
+            }
+            else if (fgcolor == "c")
+            {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+            }
+            else if (fgcolor == "dr")
+            {
+                //Console.ForegroundColor = ConsoleColor.;
             }
         }
     }
