@@ -216,6 +216,7 @@ namespace PSZO_VernyomasMero
                     TextDecoration.WriteLineCentered("--------------------");
                     TextDecoration.WriteLineCentered("1. Vérnyomás rögzítése");
                     TextDecoration.WriteLineCentered("2. Saját mérések megtekintése");
+                    TextDecoration.WriteLineCentered("3. Beállítások");
                     TextDecoration.WriteLineCentered("3. Kijelentkezés");
                     TextDecoration.WriteLineCentered("--------------------");
                     TextDecoration.WriteCentered("Válasszon: ");
@@ -241,6 +242,7 @@ namespace PSZO_VernyomasMero
                             TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
                             Console.ReadLine();
                             break;
+                        
                         case "3":
                             exit = true;
                             break;
