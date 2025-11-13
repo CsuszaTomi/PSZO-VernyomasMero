@@ -18,6 +18,7 @@ namespace PSZO_VernyomasMero
     {
         static void Main(string[] args)
         {
+            User.CollectUserData();
             while (true)
             {
                 // Teszt1
@@ -32,8 +33,10 @@ namespace PSZO_VernyomasMero
                 TextDecoration.WriteLineCentered("3. Kilépés");
                 TextDecoration.WriteLineCentered("--------------------");
                 TextDecoration.WriteCentered("Válasszon ki egy menüpontot: ");
-                choice = int.Parse(Console.ReadLine());
-                User.CollectUserData();
+                while (!int.TryParse(Console.ReadLine(), out choice))
+                {
+                    Console.WriteLine("Érvénytelen választás, próbálja újra!");
+                }
                 string UserName, FullName, Password, Gender;
                 DateTime BirthDate;
                 if (choice == 1)
@@ -67,10 +70,12 @@ namespace PSZO_VernyomasMero
                         if (User.Users[i].UserName == LoginUserName && User.Users[i].Password == LoginPassword)
                         {
                             LoggedIn(LoginUserName);
+                            break;
                         }
                         else if (LoginUserName == "admin")
                         {
                             LoggedIn("admin");
+                            break;
                         }
                         else
                         {
@@ -274,6 +279,7 @@ namespace PSZO_VernyomasMero
         /// </summary>
         public static void CollectUserData()
         {
+            Users.Clear();
             string basePath = AppDomain.CurrentDomain.BaseDirectory;
             string projectPath = Path.GetFullPath(Path.Combine(basePath, @"..\..\.."));
             string filePath = Path.Combine(projectPath, "UserData.txt");
