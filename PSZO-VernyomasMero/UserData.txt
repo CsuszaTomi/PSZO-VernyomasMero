@@ -3,3 +3,4 @@ SZB1;Szilágyi Bálint;123;2008. 06. 07.;Férfi
 NImre;Németh Imre;Skibidi;2007. 12. 14.;Férfi
 admin;Admin;123;2000. 11. 11.;Férfi
 szia;lacos lacos;jelszo;2008. 09. 26.;Férfi
+laci;Szászfai László;jelszó;2009. 09. 26.;Férfi
