@@ -247,6 +247,7 @@ namespace PSZO_VernyomasMero
                             Console.ForegroundColor = ConsoleColor.Red;
                             TextDecoration.WriteLineCentered("=== STATISZTIKÁK ===", false);
                             TextDecoration.WriteLineCentered(BpStore.InspectBP(CurrentUser.BirthDate, 120, 80, 70));
+                            TextDecoration.WriteLineCentered(BpStore.AverageBpData(LoginUserName));
                             Thread.Sleep(2000);
                             break;
                         case "4":
@@ -398,10 +399,34 @@ namespace PSZO_VernyomasMero
         /// Átlagos vérnyomás adatok számítása
         /// </summary>
         /// <returns></returns>
-        public static string AverageBpData()
+        public static string AverageBpData(string Username)
         {
-
-            return "";
+            string[] Data = ReadBpData(Username);
+            int sumsys = 0;
+            int sumdia = 0;
+            int sumpul = 0;
+            double avgsys = 0;
+            double avgdia = 0;
+            double avgpul = 0;
+            
+            for (int i = 0; i < Data.Length; i++)
+            {
+                string[] dataLine = Data[i].Split(';');
+                sumsys += Convert.ToInt32(dataLine[2]);
+                sumdia += Convert.ToInt32(dataLine[3]);
+                sumpul += Convert.ToInt32(dataLine[4]);
+            }
+            if (Data.Length > 0)
+            {
+                sumsys /= Data.Length;
+                sumdia /= Data.Length;
+                sumpul /= Data.Length;
+                return $"Átlagos értékek - Szisztolés: {sumsys} Hgmm, Diasztolés: {sumdia} Hgmm, Pulzus: {sumpul} bpm.";
+            }
+            else
+            {
+                return "Nincs elég adat az átlag számításhoz.";
+            }
         }
 
         public static string[] ReadBpData(string userName = "")
