@@ -127,14 +127,17 @@ namespace PSZO_VernyomasMero
             { 
                 string bloodPressureLevel = "";
                 DateTime date;
-
+                    
                 TextDecoration.WriteCentered("Dátum: ");
                 date = InputChecks.IsValidDate(Console.ReadLine());
+                TextDecoration.WriteCentered("Szisztolés érték (Hgmm): ");
+                int sys = int.Parse(Console.ReadLine());
+                TextDecoration.WriteCentered("Diasztolés érték (Hgmm): ");
+                int dia = int.Parse(Console.ReadLine());
+                TextDecoration.WriteCentered("Pulzus (bpm): ");
+                int pul = int.Parse(Console.ReadLine());
 
-                TextDecoration.WriteCentered("Vérnyomás: ");
-                bloodPressureLevel = Console.ReadLine();
-
-                BpStore newBpData = new BpStore(userName, date, bloodPressureLevel);
+                BpStore newBpData = new BpStore(userName, date, sys, dia, pul);
                 newBpData.SaveBpData();
             }
 
@@ -231,7 +234,9 @@ namespace PSZO_VernyomasMero
     {
         public string user;
         public DateTime date;
-        public string bpLevel;
+        public int sys;
+        public int dia;
+        public int pulse;
 
         //vérnyomás adatainak fájlba írása
         public void SaveBpData()
@@ -239,14 +244,16 @@ namespace PSZO_VernyomasMero
             string basePath = AppDomain.CurrentDomain.BaseDirectory;
             string projectPath = Path.GetFullPath(Path.Combine(basePath, @"..\..\.."));
             string filePath = Path.Combine(projectPath, "BpData.txt");
-            File.AppendAllText(filePath, $"{user};{date.ToShortDateString()};{bpLevel}\n");
+            File.AppendAllText(filePath, $"{user};{date.ToShortDateString()};{sys};{dia};{pulse}\n");
         }
 
-        public BpStore(string user, DateTime date, string bpLevel)
+        public BpStore(string user, DateTime date, int sys, int dia,int pulse)
         {
             this.user = user;
             this.date = date;
-            this.bpLevel = bpLevel;
+            this.sys = sys;
+            this.dia = dia;
+            this.pulse = pulse;
         }
     }
 
@@ -408,6 +415,9 @@ namespace PSZO_VernyomasMero
             return date;
         }
     }
+    /// <summary>
+    /// Olyan függvényeket tartalmaz amelyek a konzol szövegek dekorálására szolgálnak
+    /// </summary>
     internal class TextDecoration
     {
         /// <summary>
