@@ -20,6 +20,7 @@ namespace PSZO_VernyomasMero
         {
             while (true)
             {
+                // Teszt1
                 Console.Clear();
                 int choice = 0;
                 Console.ForegroundColor = ConsoleColor.Red;
