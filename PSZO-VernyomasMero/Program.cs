@@ -182,6 +182,47 @@ namespace PSZO_VernyomasMero
                 } while (true);
             }
 
+            static List<string> GetDifferentBPUser(double maxDiff)
+            {
+                int diffNum = 0;
+            
+                double diffPercent = 0;
+            
+                string[] users =  User.GetUserNames();
+                string[] cUserData = { };
+                string[] lineSplit = { };
+                string[] inspected = { };
+            
+                List<string> diffUsers = new List<string>{};
+            
+                foreach (string user in users)
+                {
+                    cUserData = ReadBpData(user);
+                    inspected = InspectBP(DateTime.Parse(lineSplit[1]), int.Parse(lineSplit[2]), int.Parse(lineSplit[3]), int.Parse(lineSplit[4])).Split(';');
+            
+                    foreach (string line in cUserData)
+                    {
+                        lineSplit = line.Split(';');
+            
+                        if (lineSplit[0] == user)
+                        {
+                            if (inspected[0] != "normális" || inspected[1] != "normális" || inspected[2] != "normális")
+                            {
+                                diffNum++;
+                            }
+                        }
+                    }
+            
+                    diffPercent = diffNum / cUserData.Length * 100;
+            
+                    if (diffPercent < maxDiff || diffPercent > maxDiff)
+                    {
+                        diffUsers.Add(user);
+                    }
+                }
+            
+                return diffUsers;
+            }
 
             static void RegisterBP(string userName,User CurrentUser)
             { 
