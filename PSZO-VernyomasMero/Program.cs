@@ -11,6 +11,7 @@ using System.Reflection.Metadata;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using Microsoft.VisualBasic;
 
 namespace PSZO_VernyomasMero
 {
@@ -172,6 +173,92 @@ namespace PSZO_VernyomasMero
 
                     return lines;
                 }
+            }
+
+            static string InspectBP(DateTime birthDate, int sys, int diast, int bpm)
+            {
+                // KISZÁMOLJUK AZ ÉLETKORÁT
+                int age = DateTime.Now.Year - birthDate.Year;
+                int sysMin = 0;
+                int sysMax = 0;
+                int diastMin = 0;                
+                int diastMax = 0;
+                int bpmMin = 60;
+                int bpmMax = 100;
+
+                string sysStatus = "";
+                string diastStatus = "";
+                string bpmStatus = "";
+
+                if (0 <= age && age <= 18)
+                {
+                    sysMin = 75;
+                    sysMax = 113;
+
+                    diastMin = 45;
+                    diastMax = 74;
+                }
+                else if (18 < age && age >= 60)
+                {
+                    sysMin = 105;
+                    sysMax = 125;
+
+                    diastMin = 60;
+                    diastMax = 80;
+                }
+                else
+                {
+                    sysMin = 105;
+                    sysMax = 133;
+
+                    diastMin = 60;
+                    diastMax = 83;
+                }
+
+                // VIZSGÁLJUK A SZISZTOLIKUS ÉRTÉKET
+                if (sysMin <= sys && sys <= sysMax)
+                {
+                    sysStatus = "normális";
+                }
+                else if (sys < sysMin) 
+                {
+                    sysStatus = "alacsony";
+                }
+                else
+                {
+                    sysStatus = "magas";
+                }
+
+                // VIZSGÁLJUK A DIASZTOLIKUS ÉRTÉKET
+                if (diastMin <= diast && diast <= diastMax)
+                {
+                    diastStatus = "normális";
+                }
+                else if (diast < diastMin)
+                {
+                    diastStatus = "alacsony";
+                }
+                else
+                {
+                    diastStatus = "magas";
+                }
+
+                // PULZUS VIZSGÁLAT
+                if (bpmMin <= bpm && bpm <= bpmMax)
+                {
+                    bpmStatus = "normális";   
+                }
+                else if (bpm < bpmMin)
+                {
+                    bpmStatus = "alacsony";
+                }
+                else
+                {
+                    bpmStatus = "magas";
+                }
+
+                // SZISZTÓLIKUS_ÁLLAPOTA;DIASZTÓLIKUS_ÁLLAPOTA;PULZUS_ÁLLAPOTA
+                return $"{sysStatus};{diastStatus};{bpmStatus}";
             }
 
             static void LoggedIn(string LoginUserName)
