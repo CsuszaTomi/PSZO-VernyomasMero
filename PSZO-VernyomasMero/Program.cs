@@ -52,6 +52,7 @@ namespace PSZO_VernyomasMero
                 }
                 else if (choice == 2)
                 {
+                    User CurrentUser = new User();
                     Console.Clear();
                     Console.ForegroundColor = ConsoleColor.Red;
                     TextDecoration.WriteLineCentered("=== BEJELENTKEZÉS ===", false);
@@ -66,12 +67,14 @@ namespace PSZO_VernyomasMero
                     {
                         if (User.Users[i].UserName == LoginUserName && User.Users[i].Password == LoginPassword)
                         {
-                            LoggedIn(LoginUserName);
+                            LoggedIn(LoginUserName, CurrentUser);
+                            CurrentUser = User.Users[i];
                             break;
                         }
                         else if (LoginUserName == "admin")
                         {
-                            LoggedIn("admin");
+                            LoggedIn("admin",CurrentUser);
+                            CurrentUser = User.Users[i];
                             break;
                         }
                         else
@@ -234,7 +237,7 @@ namespace PSZO_VernyomasMero
                 }
             }
 
-            static void LoggedIn(string LoginUserName)
+            static void LoggedIn(string LoginUserName,User CurrentUser)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 TextDecoration.WriteLineCentered("Sikeres bejelentkezés!", false);
@@ -279,7 +282,7 @@ namespace PSZO_VernyomasMero
                             Console.Clear();
                             Console.ForegroundColor = ConsoleColor.Red;
                             TextDecoration.WriteLineCentered("=== STATISZTIKÁK ===", false);
-                            BpStore.InspectBP(User.BirthDate, 120, 80, 70);
+                            BpStore.InspectBP(CurrentUser.BirthDate, 120, 80, 70);
                             break;
                         case "4":
                             exit = true;
