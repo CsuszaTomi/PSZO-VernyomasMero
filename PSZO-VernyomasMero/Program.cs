@@ -25,7 +25,7 @@ namespace PSZO_VernyomasMero
                 Console.Clear();
                 int choice = 0;
                 Console.ForegroundColor = ConsoleColor.Red;
-                TextDecoration.WriteLineCentered("=== VÉRNYOMÁSNAPLÓ ===");
+                TextDecoration.WriteLineCentered("=== VÉRNYOMÁSNAPLÓ ===",false);
                 Console.ForegroundColor = ConsoleColor.White;
                 TextDecoration.WriteLineCentered("-------------------");
                 TextDecoration.WriteLineCentered("1. Regisztrálás");
@@ -36,15 +36,14 @@ namespace PSZO_VernyomasMero
                 TextDecoration.WriteCentered("Válasszon ki egy menüpontot: ");
                 while (!int.TryParse(Console.ReadLine(), out choice))
                 {
-                    Console.WriteLine("Érvénytelen választás, próbálja újra!");
                 }
                 string UserName, FullName, Password, Gender;
                 DateTime BirthDate;
                 if (choice == 1)
                 {
                     Console.Clear();
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    TextDecoration.WriteLineCentered("=== REGISZTRÁCIÓ === ");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    TextDecoration.WriteLineCentered("=== REGISZTRÁCIÓ === ", false);
                     Console.ForegroundColor = ConsoleColor.White;
                     do
                     {
@@ -57,8 +56,8 @@ namespace PSZO_VernyomasMero
                 else if (choice == 2)
                 {
                     Console.Clear();
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    TextDecoration.WriteLineCentered("=== BEJELENTKEZÉS ===");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    TextDecoration.WriteLineCentered("=== BEJELENTKEZÉS ===", false);
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.WriteLine(" ");
                     TextDecoration.WriteCentered("Adja meg a felhasználó nevét: ");
@@ -84,7 +83,7 @@ namespace PSZO_VernyomasMero
                             if (check == User.Users.Count)
                             {
                                 Console.ForegroundColor = ConsoleColor.Red;
-                                TextDecoration.WriteLineCentered("Sikertelen bejelentkezés!");
+                                TextDecoration.WriteLineCentered("Sikertelen bejelentkezés!", false);
                                 Console.ForegroundColor = ConsoleColor.White;
                                 Thread.Sleep(2000);
                                 break;
@@ -95,7 +94,7 @@ namespace PSZO_VernyomasMero
                 else if (choice == 3)
                 {
                     Console.Clear();
-                    Settings();
+                    Settings.SettingsMenu();
                 }
                 else if (choice == 4)
                 {
@@ -191,14 +190,15 @@ namespace PSZO_VernyomasMero
             static void LoggedIn(string LoginUserName)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
-                TextDecoration.WriteLineCentered("Sikeres bejelentkezés!");
+                TextDecoration.WriteLineCentered("Sikeres bejelentkezés!", false);
                 Console.ForegroundColor = ConsoleColor.White;
                 Thread.Sleep(2000);
                 bool exit = false;
                 while (!exit)
                 {
                     Console.Clear();
-                    TextDecoration.WriteLineCentered($"Üdvözöljük, {LoginUserName}!");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    TextDecoration.WriteLineCentered($"Üdvözöljük, {LoginUserName}!", false);
                     TextDecoration.WriteLineCentered("--------------------");
                     TextDecoration.WriteLineCentered("1. Vérnyomás rögzítése");
                     TextDecoration.WriteLineCentered("2. Saját mérések megtekintése");
@@ -210,9 +210,11 @@ namespace PSZO_VernyomasMero
                     {
                         case "1":
                             Console.Clear();
-                            TextDecoration.WriteLineCentered("=== VÉRNYOMÁS RÖGZÍTÉSE ===");
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            TextDecoration.WriteLineCentered("=== VÉRNYOMÁS RÖGZÍTÉSE ===", false);
                             CreateBpSave(LoginUserName);
-                            TextDecoration.WriteLineCentered("Vérnyomásadat elmentve!");
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            TextDecoration.WriteLineCentered("Vérnyomásadat elmentve!", false);
                             Thread.Sleep(2000);
                             break;
                         case "2":
@@ -222,7 +224,6 @@ namespace PSZO_VernyomasMero
                             {
                                 TextDecoration.WriteLineCentered(item);
                             }
-
                             TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
                             Console.ReadLine();
                             break;
@@ -230,89 +231,11 @@ namespace PSZO_VernyomasMero
                             exit = true;
                             break;
                         default:
-                            TextDecoration.WriteLineCentered("Nincs ilyen menüpont!");
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            TextDecoration.WriteLineCentered("Nincs ilyen menüpont!", false);
                             Thread.Sleep(2000);
                             break;
                     }
-                }
-            }
-            static string Settings()
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                TextDecoration.WriteLineCentered("=== BEÁLLÍTÁSOK ===");
-                Console.ForegroundColor = ConsoleColor.White;
-                TextDecoration.WriteLineCentered("-------------------");
-                TextDecoration.WriteLineCentered("1. Téma kiválasztása");
-                TextDecoration.WriteLineCentered("2. Vissza a főmenübe");
-                TextDecoration.WriteLineCentered("--------------------");
-                TextDecoration.WriteCentered("Válasszon ki egy menüpontot: ");
-                int settingsChoice = int.Parse(Console.ReadLine());
-                if (settingsChoice == 1)
-                {
-                    Console.Clear();
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    TextDecoration.WriteLineCentered("=== HÁTTÉRSZÍN BEÁLLÍTÁSA ===");
-                    Console.ForegroundColor = ConsoleColor.White;
-                    TextDecoration.WriteLineCentered("1. Fekete háttér, fehér betűszín");
-                    TextDecoration.WriteLineCentered("2. Fehér háttér, fekete betűszín");
-                    TextDecoration.WriteCentered("Válasszon Témát: ");
-                    string bgColorInput = Console.ReadLine();
-                    if (bgColorInput == "1")
-                    {
-                        Console.BackgroundColor = ConsoleColor.Black;
-                        string fgcolor = "w";
-                        try
-                        {
-                            Console.Clear();
-                            TextDecoration.WriteLineCentered("Téma sikeresen megváltoztatva!");
-                        }
-                        catch
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            TextDecoration.WriteLineCentered("Nincs ilyen téma!");
-                            Console.ForegroundColor = ConsoleColor.White;
-                        }
-                        Thread.Sleep(2000);
-                        return fgcolor;
-                    }
-                    else if (bgColorInput == "2")
-                    {
-                        Console.BackgroundColor = ConsoleColor.White;
-                        string fgcolor = "b";
-                        try
-                        {
-                            Console.Clear();
-                            TextDecoration.WriteLineCentered("Téma sikeresen megváltoztatva!");
-                        }
-                        catch
-                        {
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            TextDecoration.WriteLineCentered("Nincs ilyen téma!");
-                            Console.ForegroundColor = ConsoleColor.White;
-                        }
-                        Thread.Sleep(2000);
-                        return fgcolor;
-                    }
-                    else
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        TextDecoration.WriteLineCentered("Nincs ilyen téma!");
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Thread.Sleep(2000);
-                        return "";
-                    }
-                }
-                else if (settingsChoice == 2)
-                {
-                    return "";
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    TextDecoration.WriteLineCentered("Nincs ilyen menüpont!");
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Thread.Sleep(2000);
-                    return "";
                 }
             }
         }
@@ -516,21 +439,134 @@ namespace PSZO_VernyomasMero
         /// A függvény a Console.WriteLine középre íratását valósítja meg
         /// </summary>
         /// <param name="text">A megadott szöveget írja ki középre</param>
-        public static void WriteLineCentered(string text)
+        /// <param name="changeColor">Igaz érték esetén megváltoztatja a konzol betűszínét a beállításoknak megfelelően</param>
+        public static void WriteLineCentered(string text,bool changeColor = true)
         // Console.WriteLine középre íratása
         {
             int width = Console.WindowWidth;
             int leftPadding = (width - text.Length) / 2;
-            if (leftPadding < 0) leftPadding = 0;
+            if (leftPadding < 0)
+            {
+                leftPadding = 0;
+            }
+            if (changeColor)
+            {
+                Settings.ChangeConsoleColors();
+            }
             Console.WriteLine(new string(' ', leftPadding) + text);
         }
-        public static void WriteCentered(string text)
+        public static void WriteCentered(string text, bool changeColor = true)
         // Console.Write középre íratása
         {
             int width = Console.WindowWidth;
             int leftPadding = (width - text.Length) / 2;
-            if (leftPadding < 0) leftPadding = 0;
+            if (leftPadding < 0)
+            {
+                leftPadding = 0;
+            }
+            if (changeColor)
+            {
+                Settings.ChangeConsoleColors();
+            }
             Console.Write(new string(' ', leftPadding) + text);
+        }
+    }
+    internal class Settings
+    {
+        static string fgcolor = "w";
+        /// <summary>
+        /// Beállítások menü megjelenítése
+        /// </summary>
+        /// <returns></returns>
+        public static void SettingsMenu()
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            TextDecoration.WriteLineCentered("=== BEÁLLÍTÁSOK ===",false);
+            Console.ForegroundColor = ConsoleColor.White;
+            TextDecoration.WriteLineCentered("-------------------");
+            TextDecoration.WriteLineCentered("1. Téma kiválasztása");
+            TextDecoration.WriteLineCentered("2. Vissza a főmenübe");
+            TextDecoration.WriteLineCentered("--------------------");
+            TextDecoration.WriteCentered("Válasszon ki egy menüpontot: ");
+            string settingsChoice = Console.ReadLine();
+            if (settingsChoice == "1")
+            {
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Red;
+                TextDecoration.WriteLineCentered("=== HÁTTÉRSZÍN BEÁLLÍTÁSA ===", false);
+                Console.ForegroundColor = ConsoleColor.White;
+                TextDecoration.WriteLineCentered("1. Fekete háttér, fehér betűszín");
+                TextDecoration.WriteLineCentered("2. Fehér háttér, fekete betűszín");
+                TextDecoration.WriteCentered("Válasszon Témát: ");
+                string bgColorInput = Console.ReadLine();
+                if (bgColorInput == "1")
+                {
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    fgcolor = "w";
+                    try
+                    {
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        TextDecoration.WriteLineCentered("Téma sikeresen megváltoztatva!", false);
+                    }
+                    catch
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        TextDecoration.WriteLineCentered("Nincs ilyen téma!", false);
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+                    Thread.Sleep(2000);
+                }
+                else if (bgColorInput == "2")
+                {
+                    Console.BackgroundColor = ConsoleColor.White;
+                    fgcolor = "b";
+                    try
+                    {
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        TextDecoration.WriteLineCentered("Téma sikeresen megváltoztatva!", false);
+                    }
+                    catch
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        TextDecoration.WriteLineCentered("Nincs ilyen téma!", false);
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+                    Thread.Sleep(2000);
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    TextDecoration.WriteLineCentered("Nincs ilyen téma!", false);
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Thread.Sleep(2000);
+                }
+            }
+            else if (settingsChoice == "2")
+            {
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                TextDecoration.WriteLineCentered("Nincs ilyen menüpont!", false);
+                Console.ForegroundColor = ConsoleColor.White;
+                Thread.Sleep(2000);
+            }
+        }
+        /// <summary>
+        /// Konzol betűszínének megváltoztatása
+        /// </summary>
+        public static void ChangeConsoleColors()
+        {
+            if (fgcolor == "w")
+            {
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+            else if (fgcolor == "b")
+            {
+                Console.ForegroundColor = ConsoleColor.Black;
+            }
         }
     }
 }
