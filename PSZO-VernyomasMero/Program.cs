@@ -11,7 +11,6 @@ using System.Reflection.Metadata;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
-using Microsoft.VisualBasic;
 
 namespace PSZO_VernyomasMero
 {
@@ -19,29 +18,32 @@ namespace PSZO_VernyomasMero
     {
         static void Main(string[] args)
         {
+            User.CollectUserData();
             while (true)
             {
                 // Teszt1
                 Console.Clear();
                 int choice = 0;
                 Console.ForegroundColor = ConsoleColor.Red;
-                TextDecoration.WriteLineCentered("=== VÉRNYOMÁSNAPLÓ ===");
+                TextDecoration.WriteLineCentered("=== VÉRNYOMÁSNAPLÓ ===", false);
                 Console.ForegroundColor = ConsoleColor.White;
                 TextDecoration.WriteLineCentered("-------------------");
                 TextDecoration.WriteLineCentered("1. Regisztrálás");
                 TextDecoration.WriteLineCentered("2. Bejelentkezés");
-                TextDecoration.WriteLineCentered("3. Kilépés");
+                TextDecoration.WriteLineCentered("3. Beállítások");
+                TextDecoration.WriteLineCentered("4. Kilépés");
                 TextDecoration.WriteLineCentered("--------------------");
                 TextDecoration.WriteCentered("Válasszon ki egy menüpontot: ");
-                choice = int.Parse(Console.ReadLine());
-                User.CollectUserData();
+                while (!int.TryParse(Console.ReadLine(), out choice))
+                {
+                }
                 string UserName, FullName, Password, Gender;
                 DateTime BirthDate;
                 if (choice == 1)
                 {
                     Console.Clear();
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    TextDecoration.WriteLineCentered("=== REGISZTRÁCIÓ === ");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    TextDecoration.WriteLineCentered("=== REGISZTRÁCIÓ === ", false);
                     Console.ForegroundColor = ConsoleColor.White;
                     do
                     {
@@ -54,8 +56,8 @@ namespace PSZO_VernyomasMero
                 else if (choice == 2)
                 {
                     Console.Clear();
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    TextDecoration.WriteLineCentered("=== BEJELENTKEZÉS ===");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    TextDecoration.WriteLineCentered("=== BEJELENTKEZÉS ===", false);
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.WriteLine(" ");
                     TextDecoration.WriteCentered("Adja meg a felhasználó nevét: ");
@@ -68,10 +70,12 @@ namespace PSZO_VernyomasMero
                         if (User.Users[i].UserName == LoginUserName && User.Users[i].Password == LoginPassword)
                         {
                             LoggedIn(LoginUserName);
+                            break;
                         }
                         else if (LoginUserName == "admin")
                         {
                             LoggedIn("admin");
+                            break;
                         }
                         else
                         {
@@ -79,7 +83,7 @@ namespace PSZO_VernyomasMero
                             if (check == User.Users.Count)
                             {
                                 Console.ForegroundColor = ConsoleColor.Red;
-                                TextDecoration.WriteLineCentered("Sikertelen bejelentkezés!");
+                                TextDecoration.WriteLineCentered("Sikertelen bejelentkezés!", false);
                                 Console.ForegroundColor = ConsoleColor.White;
                                 Thread.Sleep(2000);
                                 break;
@@ -88,6 +92,11 @@ namespace PSZO_VernyomasMero
                     }
                 }
                 else if (choice == 3)
+                {
+                    Console.Clear();
+                    Settings.SettingsMenu();
+                }
+                else if (choice == 4)
                 {
                     Environment.Exit(0);
                 }
@@ -125,54 +134,21 @@ namespace PSZO_VernyomasMero
             }
 
             static void CreateBpSave(string userName)
-            { 
+            {
                 string bloodPressureLevel = "";
                 DateTime date;
 
                 TextDecoration.WriteCentered("Dátum: ");
                 date = InputChecks.IsValidDate(Console.ReadLine());
+                TextDecoration.WriteCentered("Szisztolés érték (Hgmm): ");
+                int sys = int.Parse(Console.ReadLine());
+                TextDecoration.WriteCentered("Diasztolés érték (Hgmm): ");
+                int dia = int.Parse(Console.ReadLine());
+                TextDecoration.WriteCentered("Pulzus (bpm): ");
+                int pul = int.Parse(Console.ReadLine());
 
-                TextDecoration.WriteCentered("Vérnyomás: ");
-                bloodPressureLevel = Console.ReadLine();
-
-                BpStore newBpData = new BpStore(userName, date, bloodPressureLevel);
+                BpStore newBpData = new BpStore(userName, date, sys, dia, pul);
                 newBpData.SaveBpData();
-            }
-
-            static string[] ReadBpData(string userName = "")
-            {
-                if (userName != "")
-                {
-                    string basePath = AppDomain.CurrentDomain.BaseDirectory;
-                    string projectPath = Path.GetFullPath(Path.Combine(basePath, @"..\..\.."));
-                    string filePath = Path.Combine(projectPath, "BpData.txt");
-                    List<string> lines = new List<string>();
-
-                    using (StreamReader sr = new StreamReader(filePath))
-                    {
-                        string line;
-
-                        while ((line = sr.ReadLine()) != null)
-                        {
-                            if (line.Split(';')[0] == userName)
-                            {
-                                lines.Add(line);
-                            }
-                        }
-                    }
-
-                    return lines.ToArray();
-                }
-                else
-                {
-                    string basePath = AppDomain.CurrentDomain.BaseDirectory;
-                    string projectPath = Path.GetFullPath(Path.Combine(basePath, @"..\..\.."));
-                    string filePath = Path.Combine(projectPath, "BpData.txt");
-
-                    string[] lines = File.ReadAllLines(filePath);
-
-                    return lines;
-                }
             }
 
             static string InspectBP(DateTime birthDate, int sys, int diast, int bpm)
@@ -181,7 +157,7 @@ namespace PSZO_VernyomasMero
                 int age = DateTime.Now.Year - birthDate.Year;
                 int sysMin = 0;
                 int sysMax = 0;
-                int diastMin = 0;                
+                int diastMin = 0;
                 int diastMax = 0;
                 int bpmMin = 60;
                 int bpmMax = 100;
@@ -220,7 +196,7 @@ namespace PSZO_VernyomasMero
                 {
                     sysStatus = "normális";
                 }
-                else if (sys < sysMin) 
+                else if (sys < sysMin)
                 {
                     sysStatus = "alacsony";
                 }
@@ -246,7 +222,7 @@ namespace PSZO_VernyomasMero
                 // PULZUS VIZSGÁLAT
                 if (bpmMin <= bpm && bpm <= bpmMax)
                 {
-                    bpmStatus = "normális";   
+                    bpmStatus = "normális";
                 }
                 else if (bpm < bpmMin)
                 {
@@ -261,17 +237,54 @@ namespace PSZO_VernyomasMero
                 return $"{sysStatus};{diastStatus};{bpmStatus}";
             }
 
+            static string[] ReadBpData(string userName = "")
+            {
+                if (userName != "")
+                {
+                    string basePath = AppDomain.CurrentDomain.BaseDirectory;
+                    string projectPath = Path.GetFullPath(Path.Combine(basePath, @"..\..\.."));
+                    string filePath = Path.Combine(projectPath, "BpData.txt");
+                    List<string> lines = new List<string>();
+
+                    using (StreamReader sr = new StreamReader(filePath))
+                    {
+                        string line;
+
+                        while ((line = sr.ReadLine()) != null)
+                        {
+                            if (line.Split(';')[0] == userName)
+                            {
+                                lines.Add(line);
+                            }
+                        }
+                    }
+
+                    return lines.ToArray();
+                }
+                else
+                {
+                    string basePath = AppDomain.CurrentDomain.BaseDirectory;
+                    string projectPath = Path.GetFullPath(Path.Combine(basePath, @"..\..\.."));
+                    string filePath = Path.Combine(projectPath, "BpData.txt");
+
+                    string[] lines = File.ReadAllLines(filePath);
+
+                    return lines;
+                }
+            }
+
             static void LoggedIn(string LoginUserName)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
-                TextDecoration.WriteLineCentered("Sikeres bejelentkezés!");
+                TextDecoration.WriteLineCentered("Sikeres bejelentkezés!", false);
                 Console.ForegroundColor = ConsoleColor.White;
                 Thread.Sleep(2000);
                 bool exit = false;
                 while (!exit)
                 {
                     Console.Clear();
-                    TextDecoration.WriteLineCentered($"Üdvözöljük, {LoginUserName}!");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    TextDecoration.WriteLineCentered($"Üdvözöljük, {LoginUserName}!", false);
                     TextDecoration.WriteLineCentered("--------------------");
                     TextDecoration.WriteLineCentered("1. Vérnyomás rögzítése");
                     TextDecoration.WriteLineCentered("2. Saját mérések megtekintése");
@@ -283,9 +296,11 @@ namespace PSZO_VernyomasMero
                     {
                         case "1":
                             Console.Clear();
-                            TextDecoration.WriteLineCentered("=== VÉRNYOMÁS RÖGZÍTÉSE ===");
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            TextDecoration.WriteLineCentered("=== VÉRNYOMÁS RÖGZÍTÉSE ===", false);
                             CreateBpSave(LoginUserName);
-                            TextDecoration.WriteLineCentered("Vérnyomásadat elmentve!");
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            TextDecoration.WriteLineCentered("Vérnyomásadat elmentve!", false);
                             Thread.Sleep(2000);
                             break;
                         case "2":
@@ -302,7 +317,8 @@ namespace PSZO_VernyomasMero
                             exit = true;
                             break;
                         default:
-                            TextDecoration.WriteLineCentered("Nincs ilyen menüpont!");
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            TextDecoration.WriteLineCentered("Nincs ilyen menüpont!", false);
                             Thread.Sleep(2000);
                             break;
                     }
@@ -318,7 +334,9 @@ namespace PSZO_VernyomasMero
     {
         public string user;
         public DateTime date;
-        public string bpLevel;
+        public int sys;
+        public int dia;
+        public int pulse;
 
         //vérnyomás adatainak fájlba írása
         public void SaveBpData()
@@ -326,14 +344,16 @@ namespace PSZO_VernyomasMero
             string basePath = AppDomain.CurrentDomain.BaseDirectory;
             string projectPath = Path.GetFullPath(Path.Combine(basePath, @"..\..\.."));
             string filePath = Path.Combine(projectPath, "BpData.txt");
-            File.AppendAllText(filePath, $"{user};{date.ToShortDateString()};{bpLevel}\n");
+            File.AppendAllText(filePath, $"{user};{date.ToShortDateString()};{sys};{dia};{pulse}\n");
         }
 
-        public BpStore(string user, DateTime date, string bpLevel)
+        public BpStore(string user, DateTime date, int sys, int dia, int pulse)
         {
             this.user = user;
             this.date = date;
-            this.bpLevel = bpLevel;
+            this.sys = sys;
+            this.dia = dia;
+            this.pulse = pulse;
         }
     }
 
@@ -354,6 +374,7 @@ namespace PSZO_VernyomasMero
         /// </summary>
         public static void CollectUserData()
         {
+            Users.Clear();
             string basePath = AppDomain.CurrentDomain.BaseDirectory;
             string projectPath = Path.GetFullPath(Path.Combine(basePath, @"..\..\.."));
             string filePath = Path.Combine(projectPath, "UserData.txt");
@@ -424,28 +445,28 @@ namespace PSZO_VernyomasMero
                 Console.ForegroundColor = ConsoleColor.White;
                 return false;
             }
-            if (string.IsNullOrWhiteSpace(fullName))
+            else if (string.IsNullOrWhiteSpace(fullName))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 TextDecoration.WriteLineCentered("A teljes név nem lehet üres!");
                 Console.ForegroundColor = ConsoleColor.White;
                 return false;
             }
-            if (string.IsNullOrWhiteSpace(password))
+            else if (string.IsNullOrWhiteSpace(password))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 TextDecoration.WriteLineCentered("A jelszó nem lehet üres!");
                 Console.ForegroundColor = ConsoleColor.White;
                 return false;
             }
-            if (birth > DateTime.Now)
+            else if (birth > DateTime.Now)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 TextDecoration.WriteLineCentered("A születési dátum nem lehet a jövőben!");
                 Console.ForegroundColor = ConsoleColor.White;
                 return false;
             }
-            if (string.IsNullOrWhiteSpace(gender) || !(gender.ToLower() == "férfi" || gender.ToLower() == "nő"))
+            else if (string.IsNullOrWhiteSpace(gender) || !(gender.ToLower() == "férfi" || gender.ToLower() == "nő"))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 TextDecoration.WriteLineCentered("A nem csak 'Férfi' vagy 'Nő' lehet!");
@@ -495,27 +516,143 @@ namespace PSZO_VernyomasMero
             return date;
         }
     }
+    /// <summary>
+    /// Olyan függvényeket tartalmaz amelyek a konzol szövegek dekorálására szolgálnak
+    /// </summary>
     internal class TextDecoration
     {
         /// <summary>
         /// A függvény a Console.WriteLine középre íratását valósítja meg
         /// </summary>
         /// <param name="text">A megadott szöveget írja ki középre</param>
-        public static void WriteLineCentered(string text)
+        /// <param name="changeColor">Igaz érték esetén megváltoztatja a konzol betűszínét a beállításoknak megfelelően</param>
+        public static void WriteLineCentered(string text, bool changeColor = true)
         // Console.WriteLine középre íratása
         {
             int width = Console.WindowWidth;
             int leftPadding = (width - text.Length) / 2;
-            if (leftPadding < 0) leftPadding = 0;
+            if (leftPadding < 0)
+            {
+                leftPadding = 0;
+            }
+            if (changeColor)
+            {
+                Settings.ChangeConsoleColors();
+            }
             Console.WriteLine(new string(' ', leftPadding) + text);
         }
-        public static void WriteCentered(string text)
+        public static void WriteCentered(string text, bool changeColor = true)
         // Console.Write középre íratása
         {
             int width = Console.WindowWidth;
             int leftPadding = (width - text.Length) / 2;
-            if (leftPadding < 0) leftPadding = 0;
+            if (leftPadding < 0)
+            {
+                leftPadding = 0;
+            }
+            if (changeColor)
+            {
+                Settings.ChangeConsoleColors();
+            }
             Console.Write(new string(' ', leftPadding) + text);
+        }
+    }
+    internal class Settings
+    {
+        static string fgcolor = "w";
+        /// <summary>
+        /// Beállítások menü megjelenítése
+        /// </summary>
+        /// <returns></returns>
+        public static void SettingsMenu()
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            TextDecoration.WriteLineCentered("=== BEÁLLÍTÁSOK ===", false);
+            Console.ForegroundColor = ConsoleColor.White;
+            TextDecoration.WriteLineCentered("-------------------");
+            TextDecoration.WriteLineCentered("1. Téma kiválasztása");
+            TextDecoration.WriteLineCentered("2. Vissza a főmenübe");
+            TextDecoration.WriteLineCentered("--------------------");
+            TextDecoration.WriteCentered("Válasszon ki egy menüpontot: ");
+            string settingsChoice = Console.ReadLine();
+            if (settingsChoice == "1")
+            {
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Red;
+                TextDecoration.WriteLineCentered("=== HÁTTÉRSZÍN BEÁLLÍTÁSA ===", false);
+                Console.ForegroundColor = ConsoleColor.White;
+                TextDecoration.WriteLineCentered("1. Fekete háttér, fehér betűszín");
+                TextDecoration.WriteLineCentered("2. Fehér háttér, fekete betűszín");
+                TextDecoration.WriteCentered("Válasszon Témát: ");
+                string bgColorInput = Console.ReadLine();
+                if (bgColorInput == "1")
+                {
+                    Console.BackgroundColor = ConsoleColor.Black;
+                    fgcolor = "w";
+                    try
+                    {
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        TextDecoration.WriteLineCentered("Téma sikeresen megváltoztatva!", false);
+                    }
+                    catch
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        TextDecoration.WriteLineCentered("Nincs ilyen téma!", false);
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+                    Thread.Sleep(2000);
+                }
+                else if (bgColorInput == "2")
+                {
+                    Console.BackgroundColor = ConsoleColor.White;
+                    fgcolor = "b";
+                    try
+                    {
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        TextDecoration.WriteLineCentered("Téma sikeresen megváltoztatva!", false);
+                    }
+                    catch
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        TextDecoration.WriteLineCentered("Nincs ilyen téma!", false);
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+                    Thread.Sleep(2000);
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    TextDecoration.WriteLineCentered("Nincs ilyen téma!", false);
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Thread.Sleep(2000);
+                }
+            }
+            else if (settingsChoice == "2")
+            {
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                TextDecoration.WriteLineCentered("Nincs ilyen menüpont!", false);
+                Console.ForegroundColor = ConsoleColor.White;
+                Thread.Sleep(2000);
+            }
+        }
+        /// <summary>
+        /// Konzol betűszínének megváltoztatása
+        /// </summary>
+        public static void ChangeConsoleColors()
+        {
+            if (fgcolor == "w")
+            {
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+            else if (fgcolor == "b")
+            {
+                Console.ForegroundColor = ConsoleColor.Black;
+            }
         }
     }
 }
