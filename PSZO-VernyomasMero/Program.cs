@@ -21,7 +21,6 @@ namespace PSZO_VernyomasMero
             User.CollectUserData();
             while (true)
             {
-                // Teszt1
                 Console.Clear();
                 int choice = 0;
                 Console.ForegroundColor = ConsoleColor.Red;
@@ -106,6 +105,7 @@ namespace PSZO_VernyomasMero
                 }
             }
 
+            ///Felhasználó regisztráció
             static void RegisterUser(out string UserName, out string FullName, out string Password, out DateTime BirthDate, out string Gender)
             {
                 // Felhasználónév
@@ -181,49 +181,7 @@ namespace PSZO_VernyomasMero
                     }
                 } while (true);
             }
-
-            static List<string> GetDifferentBPUser(double maxDiff)
-            {
-                int diffNum = 0;
-            
-                double diffPercent = 0;
-            
-                string[] users =  User.GetUserNames();
-                string[] cUserData = { };
-                string[] lineSplit = { };
-                string[] inspected = { };
-            
-                List<string> diffUsers = new List<string>{};
-            
-                foreach (string user in users)
-                {
-                    cUserData = ReadBpData(user);
-                    inspected = InspectBP(DateTime.Parse(lineSplit[1]), int.Parse(lineSplit[2]), int.Parse(lineSplit[3]), int.Parse(lineSplit[4])).Split(';');
-            
-                    foreach (string line in cUserData)
-                    {
-                        lineSplit = line.Split(';');
-            
-                        if (lineSplit[0] == user)
-                        {
-                            if (inspected[0] != "normális" || inspected[1] != "normális" || inspected[2] != "normális")
-                            {
-                                diffNum++;
-                            }
-                        }
-                    }
-            
-                    diffPercent = diffNum / cUserData.Length * 100;
-            
-                    if (diffPercent < maxDiff || diffPercent > maxDiff)
-                    {
-                        diffUsers.Add(user);
-                    }
-                }
-            
-                return diffUsers;
-            }
-
+            // Vérnyomás adatainak rögzítése
             static void RegisterBP(string userName,User CurrentUser)
             { 
                 string bloodPressureLevel = "";
@@ -241,7 +199,7 @@ namespace PSZO_VernyomasMero
                 BpStore newBpData = new BpStore(userName, date, sys, dia, pul);
                 newBpData.SaveBpData();
             }
-
+            // Bejelentkezés utáni menü
             static void LoggedIn(string LoginUserName,User CurrentUser)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
@@ -258,7 +216,7 @@ namespace PSZO_VernyomasMero
                     TextDecoration.WriteLineCentered("1. Vérnyomás rögzítése");
                     TextDecoration.WriteLineCentered("2. Saját mérések megtekintése");
                     TextDecoration.WriteLineCentered("3. Statisztikák");
-                    TextDecoration.WriteLineCentered("3. Beállítások");
+                    TextDecoration.WriteLineCentered("4. Beállítások");
                     TextDecoration.WriteLineCentered("5. Kijelentkezés");
                     TextDecoration.WriteLineCentered("--------------------");
                     TextDecoration.WriteCentered("Válasszon: ");
@@ -290,6 +248,12 @@ namespace PSZO_VernyomasMero
                             TextDecoration.WriteLineCentered("=== STATISZTIKÁK ===", false);
                             TextDecoration.WriteLineCentered(BpStore.InspectBP(CurrentUser.BirthDate, 120, 80, 70));
                             TextDecoration.WriteLineCentered(BpStore.AverageBpData(LoginUserName));
+                            List<string> diffusers = BpStore.GetDifferentBPUser(30);
+                            TextDecoration.WriteLineCentered("Felhasználók, akiknél >30% eltérés van:");
+                            foreach (var user in diffusers)
+                            {
+                                TextDecoration.WriteLineCentered(user);
+                            }
                             Thread.Sleep(2000);
                             break;
                         case "4":
@@ -478,6 +442,59 @@ namespace PSZO_VernyomasMero
             }
         }
 
+        /// <summary>
+        /// Visszaadja azon felhasználók listáját, akiknél a mérések meghatározott százaléka eltér a normálistól.
+        /// </summary>
+        /// <param name="maxDiff">A megengedett maximum eltérés százalékban</param>
+        /// <returns>Felhasználónevek listája</returns>
+        public static List<string> GetDifferentBPUser(double maxDiff)
+        {
+            int diffNum = 0;
+
+            double diffPercent = 0;
+
+            string[] users = User.GetUserNames();
+            string[] cUserData = { };
+            string[] lineSplit = { };
+            string[] inspected = { };
+
+            List<string> diffUsers = new List<string> { };
+
+            foreach (string user in users)
+            {
+                cUserData = BpStore.ReadBpData(user);
+                inspected = BpStore.InspectBP(DateTime.Parse(lineSplit[1]), int.Parse(lineSplit[2]), int.Parse(lineSplit[3]), int.Parse(lineSplit[4])).Split(';');
+
+                foreach (string line in cUserData)
+                {
+                    lineSplit = line.Split(';');
+
+                    if (lineSplit[0] == user)
+                    {
+                        if (inspected[0] != "normális" || inspected[1] != "normális" || inspected[2] != "normális")
+                        {
+                            diffNum++;
+                        }
+                    }
+                }
+
+                diffPercent = diffNum / cUserData.Length * 100;
+
+                if (diffPercent < maxDiff || diffPercent > maxDiff)
+                {
+                    diffUsers.Add(user);
+                }
+            }
+
+            return diffUsers;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <returns></returns>
         public static string[] ReadBpData(string userName = "")
         {
             if (userName != "")
@@ -517,7 +534,7 @@ namespace PSZO_VernyomasMero
     }
 
     /// <summary>
-    /// A FELHASZNÁLÓ ÉS ANNAK ADATAI
+    /// A FELHASZNÁLÓ ÉS ANNAK ADATAaaI
     /// </summary>
     internal class User
     {
@@ -595,16 +612,6 @@ namespace PSZO_VernyomasMero
             NewUser.Gender = gender;
             Users.Add(NewUser);
         }
-
-        /// <summary>
-        /// User adatok beírásának ellenörzése
-        /// </summary>
-        /// <param name="userName"></param>
-        /// <param name="fullName"></param>
-        /// <param name="password"></param>
-        /// <param name="birth"></param>
-        /// <param name="gender"></param>
-        /// <returns></returns>
 
         /// <summary>
         /// A felhasználó adatainak fájlba írása
