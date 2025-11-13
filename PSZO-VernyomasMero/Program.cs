@@ -18,8 +18,10 @@ namespace PSZO_VernyomasMero
     {
         static void Main(string[] args)
         {
+            User.CollectUserData();
             while (true)
             {
+                // Teszt1
                 Console.Clear();
                 int choice = 0;
                 Console.ForegroundColor = ConsoleColor.Red;
@@ -32,8 +34,10 @@ namespace PSZO_VernyomasMero
                 TextDecoration.WriteLineCentered("4. Kilépés");
                 TextDecoration.WriteLineCentered("--------------------");
                 TextDecoration.WriteCentered("Válasszon ki egy menüpontot: ");
-                choice = int.Parse(Console.ReadLine());
-                User.CollectUserData();
+                while (!int.TryParse(Console.ReadLine(), out choice))
+                {
+                    Console.WriteLine("Érvénytelen választás, próbálja újra!");
+                }
                 string UserName, FullName, Password, Gender;
                 DateTime BirthDate;
                 if (choice == 1)
@@ -67,10 +71,12 @@ namespace PSZO_VernyomasMero
                         if (User.Users[i].UserName == LoginUserName && User.Users[i].Password == LoginPassword)
                         {
                             LoggedIn(LoginUserName);
+                            break;
                         }
                         else if (LoginUserName == "admin")
                         {
                             LoggedIn("admin");
+                            break;
                         }
                         else
                         {
@@ -132,14 +138,17 @@ namespace PSZO_VernyomasMero
             { 
                 string bloodPressureLevel = "";
                 DateTime date;
-
+                    
                 TextDecoration.WriteCentered("Dátum: ");
                 date = InputChecks.IsValidDate(Console.ReadLine());
+                TextDecoration.WriteCentered("Szisztolés érték (Hgmm): ");
+                int sys = int.Parse(Console.ReadLine());
+                TextDecoration.WriteCentered("Diasztolés érték (Hgmm): ");
+                int dia = int.Parse(Console.ReadLine());
+                TextDecoration.WriteCentered("Pulzus (bpm): ");
+                int pul = int.Parse(Console.ReadLine());
 
-                TextDecoration.WriteCentered("Vérnyomás: ");
-                bloodPressureLevel = Console.ReadLine();
-
-                BpStore newBpData = new BpStore(userName, date, bloodPressureLevel);
+                BpStore newBpData = new BpStore(userName, date, sys, dia, pul);
                 newBpData.SaveBpData();
             }
 
@@ -315,7 +324,9 @@ namespace PSZO_VernyomasMero
     {
         public string user;
         public DateTime date;
-        public string bpLevel;
+        public int sys;
+        public int dia;
+        public int pulse;
 
         //vérnyomás adatainak fájlba írása
         public void SaveBpData()
@@ -323,14 +334,16 @@ namespace PSZO_VernyomasMero
             string basePath = AppDomain.CurrentDomain.BaseDirectory;
             string projectPath = Path.GetFullPath(Path.Combine(basePath, @"..\..\.."));
             string filePath = Path.Combine(projectPath, "BpData.txt");
-            File.AppendAllText(filePath, $"{user};{date.ToShortDateString()};{bpLevel}\n");
+            File.AppendAllText(filePath, $"{user};{date.ToShortDateString()};{sys};{dia};{pulse}\n");
         }
 
-        public BpStore(string user, DateTime date, string bpLevel)
+        public BpStore(string user, DateTime date, int sys, int dia,int pulse)
         {
             this.user = user;
             this.date = date;
-            this.bpLevel = bpLevel;
+            this.sys = sys;
+            this.dia = dia;
+            this.pulse = pulse;
         }
     }
 
@@ -351,6 +364,7 @@ namespace PSZO_VernyomasMero
         /// </summary>
         public static void CollectUserData()
         {
+            Users.Clear();
             string basePath = AppDomain.CurrentDomain.BaseDirectory;
             string projectPath = Path.GetFullPath(Path.Combine(basePath, @"..\..\.."));
             string filePath = Path.Combine(projectPath, "UserData.txt");
@@ -421,28 +435,28 @@ namespace PSZO_VernyomasMero
                 Console.ForegroundColor = ConsoleColor.White;
                 return false;
             }
-            if (string.IsNullOrWhiteSpace(fullName))
+            else if (string.IsNullOrWhiteSpace(fullName))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 TextDecoration.WriteLineCentered("A teljes név nem lehet üres!");
                 Console.ForegroundColor = ConsoleColor.White;
                 return false;
             }
-            if (string.IsNullOrWhiteSpace(password))
+            else if (string.IsNullOrWhiteSpace(password))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 TextDecoration.WriteLineCentered("A jelszó nem lehet üres!");
                 Console.ForegroundColor = ConsoleColor.White;
                 return false;
             }
-            if (birth > DateTime.Now)
+            else if (birth > DateTime.Now)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 TextDecoration.WriteLineCentered("A születési dátum nem lehet a jövőben!");
                 Console.ForegroundColor = ConsoleColor.White;
                 return false;
             }
-            if (string.IsNullOrWhiteSpace(gender) || !(gender.ToLower() == "férfi" || gender.ToLower() == "nő"))
+            else if (string.IsNullOrWhiteSpace(gender) || !(gender.ToLower() == "férfi" || gender.ToLower() == "nő"))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 TextDecoration.WriteLineCentered("A nem csak 'Férfi' vagy 'Nő' lehet!");
@@ -492,6 +506,9 @@ namespace PSZO_VernyomasMero
             return date;
         }
     }
+    /// <summary>
+    /// Olyan függvényeket tartalmaz amelyek a konzol szövegek dekorálására szolgálnak
+    /// </summary>
     internal class TextDecoration
     {
         /// <summary>
