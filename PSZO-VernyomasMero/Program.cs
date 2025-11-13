@@ -183,7 +183,7 @@ namespace PSZO_VernyomasMero
             }
 
 
-            static void RegisterBP(string userName)
+            static void RegisterBP(string userName,User CurrentUser)
             { 
                 string bloodPressureLevel = "";
                 DateTime date;
@@ -196,131 +196,9 @@ namespace PSZO_VernyomasMero
                 int dia = int.Parse(Console.ReadLine());
                 TextDecoration.WriteCentered("Pulzus (bpm): ");
                 int pul = int.Parse(Console.ReadLine());
-
+                TextDecoration.WriteLineCentered(BpStore.InspectBP(CurrentUser.BirthDate, sys, dia, pul));
                 BpStore newBpData = new BpStore(userName, date, sys, dia, pul);
                 newBpData.SaveBpData();
-            }
-
-            static string InspectBP(DateTime birthDate, int sys, int diast, int bpm)
-            {
-                // KISZÁMOLJUK AZ ÉLETKORÁT
-                int age = DateTime.Now.Year - birthDate.Year;
-                int sysMin = 0;
-                int sysMax = 0;
-                int diastMin = 0;
-                int diastMax = 0;
-                int bpmMin = 60;
-                int bpmMax = 100;
-
-                string sysStatus = "";
-                string diastStatus = "";
-                string bpmStatus = "";
-
-                if (0 <= age && age <= 18)
-                {
-                    sysMin = 75;
-                    sysMax = 113;
-
-                    diastMin = 45;
-                    diastMax = 74;
-                }
-                else if (18 < age && age >= 60)
-                {
-                    sysMin = 105;
-                    sysMax = 125;
-
-                    diastMin = 60;
-                    diastMax = 80;
-                }
-                else
-                {
-                    sysMin = 105;
-                    sysMax = 133;
-
-                    diastMin = 60;
-                    diastMax = 83;
-                }
-
-                // VIZSGÁLJUK A SZISZTOLIKUS ÉRTÉKET
-                if (sysMin <= sys && sys <= sysMax)
-                {
-                    sysStatus = "normális";
-                }
-                else if (sys < sysMin)
-                {
-                    sysStatus = "alacsony";
-                }
-                else
-                {
-                    sysStatus = "magas";
-                }
-
-                // VIZSGÁLJUK A DIASZTOLIKUS ÉRTÉKET
-                if (diastMin <= diast && diast <= diastMax)
-                {
-                    diastStatus = "normális";
-                }
-                else if (diast < diastMin)
-                {
-                    diastStatus = "alacsony";
-                }
-                else
-                {
-                    diastStatus = "magas";
-                }
-
-                // PULZUS VIZSGÁLAT
-                if (bpmMin <= bpm && bpm <= bpmMax)
-                {
-                    bpmStatus = "normális";
-                }
-                else if (bpm < bpmMin)
-                {
-                    bpmStatus = "alacsony";
-                }
-                else
-                {
-                    bpmStatus = "magas";
-                }
-
-                // SZISZTÓLIKUS_ÁLLAPOTA;DIASZTÓLIKUS_ÁLLAPOTA;PULZUS_ÁLLAPOTA
-                return $"{sysStatus};{diastStatus};{bpmStatus}";
-            }
-
-            static string[] ReadBpData(string userName = "")
-            {
-                if (userName != "")
-                {
-                    string basePath = AppDomain.CurrentDomain.BaseDirectory;
-                    string projectPath = Path.GetFullPath(Path.Combine(basePath, @"..\..\.."));
-                    string filePath = Path.Combine(projectPath, "BpData.txt");
-                    List<string> lines = new List<string>();
-
-                    using (StreamReader sr = new StreamReader(filePath))
-                    {
-                        string line;
-
-                        while ((line = sr.ReadLine()) != null)
-                        {
-                            if (line.Split(';')[0] == userName)
-                            {
-                                lines.Add(line);
-                            }
-                        }
-                    }
-
-                    return lines.ToArray();
-                }
-                else
-                {
-                    string basePath = AppDomain.CurrentDomain.BaseDirectory;
-                    string projectPath = Path.GetFullPath(Path.Combine(basePath, @"..\..\.."));
-                    string filePath = Path.Combine(projectPath, "BpData.txt");
-
-                    string[] lines = File.ReadAllLines(filePath);
-
-                    return lines;
-                }
             }
 
             static void LoggedIn(string LoginUserName,User CurrentUser)
@@ -349,10 +227,10 @@ namespace PSZO_VernyomasMero
                             Console.Clear();
                             Console.ForegroundColor = ConsoleColor.Red;
                             TextDecoration.WriteLineCentered("=== VÉRNYOMÁS RÖGZÍTÉSE ===", false);
-                            RegisterBP(LoginUserName);
+                            RegisterBP(LoginUserName, CurrentUser);
                             Console.ForegroundColor = ConsoleColor.Green;
                             TextDecoration.WriteLineCentered("Vérnyomásadat elmentve!", false);
-                            Thread.Sleep(2000);
+                            Thread.Sleep(4000);
                             break;
                         case "2":
                             var bpuserdata = ReadBpData(LoginUserName);
@@ -368,7 +246,8 @@ namespace PSZO_VernyomasMero
                             Console.Clear();
                             Console.ForegroundColor = ConsoleColor.Red;
                             TextDecoration.WriteLineCentered("=== STATISZTIKÁK ===", false);
-                            BpStore.InspectBP(CurrentUser.BirthDate, 120, 80, 70);
+                            TextDecoration.WriteLineCentered(BpStore.InspectBP(CurrentUser.BirthDate, 120, 80, 70));
+                            Thread.Sleep(2000);
                             break;
                         case "4":
                             exit = true;
@@ -514,6 +393,53 @@ namespace PSZO_VernyomasMero
             // SZISZTÓLIKUS_ÁLLAPOTA;DIASZTÓLIKUS_ÁLLAPOTA;PULZUS_ÁLLAPOTA
             return $"{sysStatus};{diastStatus};{bpmStatus}";
         }
+
+        /// <summary>
+        /// Átlagos vérnyomás adatok számítása
+        /// </summary>
+        /// <returns></returns>
+        public static string AverageBpData()
+        {
+
+            return "";
+        }
+
+        static string[] ReadBpData(string userName = "")
+        {
+            if (userName != "")
+            {
+                string basePath = AppDomain.CurrentDomain.BaseDirectory;
+                string projectPath = Path.GetFullPath(Path.Combine(basePath, @"..\..\.."));
+                string filePath = Path.Combine(projectPath, "BpData.txt");
+                List<string> lines = new List<string>();
+
+                using (StreamReader sr = new StreamReader(filePath))
+                {
+                    string line;
+
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        if (line.Split(';')[0] == userName)
+                        {
+                            lines.Add(line);
+                        }
+                    }
+                }
+
+                return lines.ToArray();
+            }
+            else
+            {
+                string basePath = AppDomain.CurrentDomain.BaseDirectory;
+                string projectPath = Path.GetFullPath(Path.Combine(basePath, @"..\..\.."));
+                string filePath = Path.Combine(projectPath, "BpData.txt");
+
+                string[] lines = File.ReadAllLines(filePath);
+
+                return lines;
+            }
+        }
+
     }
 
     /// <summary>

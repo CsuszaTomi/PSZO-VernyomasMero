@@ -4,3 +4,5 @@ NImre;Németh Imre;Skibidi;2007. 12. 14.;Férfi
 admin;Admin;123;2000. 11. 11.;Férfi
 szia;lacos lacos;jelszo;2008. 09. 26.;Férfi
 Fasza;Nagy fasza;123;2001. 11. 11.;Nő
+dunkagay;fasz;1234;2005. 05. 05.;Nő
+Dunkagay;pina;1234;2005. 05. 05.;Nő
