@@ -45,10 +45,7 @@ namespace PSZO_VernyomasMero
                     Console.ForegroundColor = ConsoleColor.Red;
                     TextDecoration.WriteLineCentered("=== REGISZTRÁCIÓ === ", false);
                     Console.ForegroundColor = ConsoleColor.White;
-                    do
-                    {
-                        RegisterUser(out UserName, out FullName, out Password, out BirthDate, out Gender);
-                    } while (!User.ValidateUserData(UserName, FullName, Password, BirthDate, Gender));
+                    RegisterUser(out UserName, out FullName, out Password, out BirthDate, out Gender);
                     User.AddUser(UserName, FullName, Password, BirthDate, Gender);
                     User.ShowUsers();
                     User.SaveUserData();
@@ -108,30 +105,80 @@ namespace PSZO_VernyomasMero
 
             static void RegisterUser(out string UserName, out string FullName, out string Password, out DateTime BirthDate, out string Gender)
             {
-                UserName = "";
-                FullName = "";
-                Password = "";
-                BirthDate = DateTime.Now;
-                Gender = "";
-                TextDecoration.WriteCentered("Adja meg a felhasználó nevét: ");
-                UserName = Console.ReadLine();
-                TextDecoration.WriteCentered("Adja meg a teljes nevét: ");
-                FullName = Console.ReadLine();
-                TextDecoration.WriteCentered("Adja meg a jelszavát: ");
-                Password = Console.ReadLine();
-                TextDecoration.WriteCentered("Adja meg a születési dátumát (ÉÉÉÉ-HH-NN): ");
-                string BirthDateInput = Console.ReadLine();
-                while (!DateTime.TryParse(BirthDateInput, out DateTime birth))
+                // Felhasználónév
+                do
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    TextDecoration.WriteCentered("Nem jól adta meg a dátumot! Írja be újra: ");
-                    Console.ForegroundColor = ConsoleColor.White;
-                    BirthDateInput = Console.ReadLine();
-                }
-                BirthDate = Convert.ToDateTime(BirthDateInput);
-                TextDecoration.WriteCentered("Adja meg a nemét (Férfi/Nő): ");
-                Gender = Console.ReadLine();
+                    TextDecoration.WriteCentered("Adja meg a felhasználó nevét: ");
+                    UserName = Console.ReadLine();
+                    if (string.IsNullOrWhiteSpace(UserName))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        TextDecoration.WriteLineCentered("A felhasználónév nem lehet üres!", false);
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+                } while (string.IsNullOrWhiteSpace(UserName));
+
+                //Teljes nev
+                do
+                {
+                    TextDecoration.WriteCentered("Adja meg a teljes nevét: ");
+                    FullName = Console.ReadLine();
+                    if (string.IsNullOrWhiteSpace(FullName))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        TextDecoration.WriteLineCentered("A teljes név nem lehet üres!", false);
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+                } while (string.IsNullOrWhiteSpace(FullName));
+
+                //Jelszo
+                do
+                {
+                    TextDecoration.WriteCentered("Adja meg a jelszavát: ");
+                    Password = Console.ReadLine();
+                    if (string.IsNullOrWhiteSpace(Password))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        TextDecoration.WriteLineCentered("A jelszó nem lehet üres!",false);
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+                } while (string.IsNullOrWhiteSpace(Password));
+
+                //Szuldat
+                do
+                {
+                    TextDecoration.WriteCentered("Adja meg a születési dátumát (ÉÉÉÉ-HH-NN): ");
+                    string BirthDateInput = Console.ReadLine();
+                    if (!DateTime.TryParse(BirthDateInput, out BirthDate) || BirthDate > DateTime.Now)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        TextDecoration.WriteLineCentered("Érvénytelen dátum!", false);
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+                    else
+                    { 
+                        break;
+                    }
+                } while (true);
+
+                //Nem
+                do
+                {
+                    TextDecoration.WriteCentered("Adja meg a nemét (Férfi/Nő): ");
+                    Gender = Console.ReadLine();
+                    if (string.IsNullOrWhiteSpace(Gender) || !(Gender.ToLower() == "férfi" || Gender.ToLower() == "nő"))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        TextDecoration.WriteLineCentered("A nem csak 'Férfi' vagy 'Nő' lehet!", false);
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                } while (true);
             }
+
 
             static void CreateBpSave(string userName)
             { 
@@ -350,45 +397,6 @@ namespace PSZO_VernyomasMero
         /// <param name="birth"></param>
         /// <param name="gender"></param>
         /// <returns></returns>
-        public static bool ValidateUserData(string userName, string fullName, string password, DateTime birth, string gender)
-        {
-            if (string.IsNullOrWhiteSpace(userName))
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                TextDecoration.WriteLineCentered("A felhasználónév nem lehet üres!");
-                Console.ForegroundColor = ConsoleColor.White;
-                return false;
-            }
-            else if (string.IsNullOrWhiteSpace(fullName))
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                TextDecoration.WriteLineCentered("A teljes név nem lehet üres!");
-                Console.ForegroundColor = ConsoleColor.White;
-                return false;
-            }
-            else if (string.IsNullOrWhiteSpace(password))
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                TextDecoration.WriteLineCentered("A jelszó nem lehet üres!");
-                Console.ForegroundColor = ConsoleColor.White;
-                return false;
-            }
-            else if (birth > DateTime.Now)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                TextDecoration.WriteLineCentered("A születési dátum nem lehet a jövőben!");
-                Console.ForegroundColor = ConsoleColor.White;
-                return false;
-            }
-            else if (string.IsNullOrWhiteSpace(gender) || !(gender.ToLower() == "férfi" || gender.ToLower() == "nő"))
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                TextDecoration.WriteLineCentered("A nem csak 'Férfi' vagy 'Nő' lehet!");
-                Console.ForegroundColor = ConsoleColor.White;
-                return false;
-            }
-            return true;
-        }
 
         /// <summary>
         /// A felhasználó adatainak fájlba írása
@@ -423,7 +431,7 @@ namespace PSZO_VernyomasMero
             while (!DateTime.TryParse(dateInput, out date))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write("Nem jól adta meg a dátumot! Írja be újra: ");
+                TextDecoration.WriteLineCentered("Nem jól adta meg a dátumot! Írja be újra: ",false);
                 Console.ForegroundColor = ConsoleColor.White;
                 dateInput = Console.ReadLine();
             }
