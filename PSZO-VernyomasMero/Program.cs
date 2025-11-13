@@ -216,6 +216,7 @@ namespace PSZO_VernyomasMero
                             {
                                 TextDecoration.WriteLineCentered(item);
                             }
+
                             TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
                             Console.ReadLine();
                             break;
