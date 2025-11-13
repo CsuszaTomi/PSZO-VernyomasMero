@@ -63,11 +63,11 @@ namespace PSZO_VernyomasMero
                     int check = 0;
                     for (int i = 0; i < User.Users.Count; i++)
                     {
-                        if (LoginUserName == "admin")
+                        if (User.Users[i].UserName == LoginUserName && User.Users[i].Password == LoginPassword)
                         {
                             LoggedIn(LoginUserName);
                         }
-                        else if (User.Users[i].UserName == LoginUserName && User.Users[i].Password == LoginPassword)
+                        else if (LoginUserName == "admin")
                         {
                             LoggedIn("admin");
                         }
