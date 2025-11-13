@@ -25,7 +25,7 @@ namespace PSZO_VernyomasMero
                 Console.Clear();
                 int choice = 0;
                 Console.ForegroundColor = ConsoleColor.Red;
-                TextDecoration.WriteLineCentered("=== VÉRNYOMÁSNAPLÓ ===",false);
+                TextDecoration.WriteLineCentered("=== VÉRNYOMÁSNAPLÓ ===", false);
                 Console.ForegroundColor = ConsoleColor.White;
                 TextDecoration.WriteLineCentered("-------------------");
                 TextDecoration.WriteLineCentered("1. Regisztrálás");
@@ -73,7 +73,7 @@ namespace PSZO_VernyomasMero
                         }
                         else if (LoginUserName == "admin")
                         {
-                            LoggedIn("admin",CurrentUser);
+                            LoggedIn("admin", CurrentUser);
                             CurrentUser = User.Users[i];
                             break;
                         }
@@ -142,7 +142,7 @@ namespace PSZO_VernyomasMero
                     if (string.IsNullOrWhiteSpace(Password))
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
-                        TextDecoration.WriteLineCentered("A jelszó nem lehet üres!",false);
+                        TextDecoration.WriteLineCentered("A jelszó nem lehet üres!", false);
                         Console.ForegroundColor = ConsoleColor.White;
                     }
                 } while (string.IsNullOrWhiteSpace(Password));
@@ -159,7 +159,7 @@ namespace PSZO_VernyomasMero
                         Console.ForegroundColor = ConsoleColor.White;
                     }
                     else
-                    { 
+                    {
                         break;
                     }
                 } while (true);
@@ -187,7 +187,7 @@ namespace PSZO_VernyomasMero
             { 
                 string bloodPressureLevel = "";
                 DateTime date;
-                    
+
                 TextDecoration.WriteCentered("Dátum: ");
                 date = InputChecks.IsValidDate(Console.ReadLine());
                 TextDecoration.WriteCentered("Szisztolés érték (Hgmm): ");
@@ -285,6 +285,8 @@ namespace PSZO_VernyomasMero
             string filePath = Path.Combine(projectPath, "BpData.txt");
             File.AppendAllText(filePath, $"{user};{date.ToShortDateString()};{sys};{dia};{pulse}\n");
         }
+
+        
         /// <summary>
         /// Vérnyomás adatainak összeállítása
         /// </summary>
@@ -309,6 +311,7 @@ namespace PSZO_VernyomasMero
         /// <param name="diast"></param>
         /// <param name="bpm"></param>
         /// <returns></returns>
+
         public static string InspectBP(DateTime birthDate, int sys, int diast, int bpm)
         {
             // KISZÁMOLJUK AZ ÉLETKORÁT
