@@ -51,7 +51,7 @@ namespace PSZO_VernyomasMero
                 }
                 else if (choice == 2)
                 {
-                    User CurrentUser = new User();
+                    User LoggedInUser = new User();
                     Console.Clear();
                     Console.ForegroundColor = ConsoleColor.Red;
                     TextDecoration.WriteLineCentered("=== BEJELENTKEZÉS ===", false);
@@ -66,14 +66,14 @@ namespace PSZO_VernyomasMero
                     {
                         if (User.Users[i].UserName == LoginUserName && User.Users[i].Password == LoginPassword)
                         {
-                            LoggedIn(LoginUserName, CurrentUser);
-                            CurrentUser = User.Users[i];
+                            LoggedIn(LoginUserName, LoggedInUser);
+                            LoggedInUser = User.Users[i];
                             break;
                         }
                         else if (LoginUserName == "admin")
                         {
-                            LoggedIn("admin", CurrentUser);
-                            CurrentUser = User.Users[i];
+                            LoggedIn("admin", LoggedInUser);
+                            LoggedInUser = User.Users[i];
                             break;
                         }
                         else
