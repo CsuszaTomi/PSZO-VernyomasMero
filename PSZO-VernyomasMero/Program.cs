@@ -236,10 +236,7 @@ namespace PSZO_VernyomasMero
                         case "2":
                             var bpuserdata = BpStore.ReadBpData(LoginUserName);
                             TextDecoration.WriteLineCentered("Saját mérései:");
-                            foreach (var item in bpuserdata)
-                            {
-                                TextDecoration.WriteLineCentered(item);
-                            }
+                            BpStore.PrintBpTable(LoginUserName);
                             TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
                             Console.ReadLine();
                             break;
@@ -492,6 +489,33 @@ namespace PSZO_VernyomasMero
             }                
 
             return diffUsers;
+        }
+
+        /// <summary>
+        /// Vérnyomás adatok kiírása táblázatos formában
+        /// </summary>
+        /// <param name="username"></param>
+        public static void PrintBpTable(string username)
+        {
+            string[] userbpdata = ReadBpData(username);
+            if (userbpdata.Length == 0)
+            {
+                TextDecoration.WriteLineCentered("Nincs adat");
+                return;
+            }
+            TextDecoration.WriteLineCentered("╔══════════════════╦═══════╦═══════╦═══════╗");
+            TextDecoration.WriteLineCentered("║ Dátum            ║  SYS  ║  DIA  ║  PUL  ║");
+            TextDecoration.WriteLineCentered("╠══════════════════╬═══════╬═══════╬═══════╣");
+            foreach (var line in userbpdata)
+            {
+                string[] split = line.Split(';');
+                string date = split[1].PadRight(16);
+                string sys = split[2].PadLeft(5);
+                string dia = split[3].PadLeft(5);
+                string pul = split[4].PadLeft(5);
+                TextDecoration.WriteLineCentered($"║ {date} ║ {sys} ║ {dia} ║ {pul} ║");
+            }
+            TextDecoration.WriteLineCentered("╚══════════════════════════════════════════╝");
         }
 
 
