@@ -41,7 +41,7 @@ namespace PSZO_VernyomasMero
                 if (choice == 1)
                 {
                     Console.Clear();
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.ForegroundColor = ConsoleColor.Red;
                     TextDecoration.WriteLineCentered("=== REGISZTRÁCIÓ === ", false);
                     Console.ForegroundColor = ConsoleColor.White;
                     RegisterUser(out UserName, out FullName, out Password, out BirthDate, out Gender);
@@ -53,7 +53,7 @@ namespace PSZO_VernyomasMero
                 {
                     User CurrentUser = new User();
                     Console.Clear();
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.ForegroundColor = ConsoleColor.Red;
                     TextDecoration.WriteLineCentered("=== BEJELENTKEZÉS ===", false);
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.WriteLine(" ");
@@ -101,11 +101,12 @@ namespace PSZO_VernyomasMero
                 }
                 else
                 {
-                    TextDecoration.WriteLineCentered("Nincs ilyen menüpont!");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    TextDecoration.WriteLineCentered("Nincs ilyen menüpont!", false);
                 }
             }
 
-            ///Felhasználó regisztráció
+            // Felhasználó regisztráció
             static void RegisterUser(out string UserName, out string FullName, out string Password, out DateTime BirthDate, out string Gender)
             {
                 // Felhasználónév
@@ -710,6 +711,9 @@ namespace PSZO_VernyomasMero
             Console.Write(new string(' ', leftPadding) + text);
         }
     }
+    /// <summary>
+    /// Olyan függvényeket tarlamaz amelyek a konzol beállításaira szolgálnak
+    /// </summary>
     internal class Settings
     {
         static string fgcolor = "w";
