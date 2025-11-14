@@ -188,7 +188,7 @@ namespace PSZO_VernyomasMero
                 DateTime date;
 
                 TextDecoration.WriteCentered("Dátum: ");
-                date = InputChecks.IsValidDate(Console.ReadLine());
+                date = InputChecks.IsValidDate(Console.ReadLine(),true);
                 TextDecoration.WriteCentered("Szisztolés érték (Hgmm): ");
                 int sys = int.Parse(Console.ReadLine());
                 TextDecoration.WriteCentered("Diasztolés érték (Hgmm): ");
@@ -246,10 +246,9 @@ namespace PSZO_VernyomasMero
                             Console.Clear();
                             Console.ForegroundColor = ConsoleColor.Red;
                             TextDecoration.WriteLineCentered("=== STATISZTIKÁK ===", false);
-                            TextDecoration.WriteLineCentered(BpStore.InspectBP(CurrentUser.BirthDate, 120, 80, 70));
                             TextDecoration.WriteLineCentered(BpStore.AverageBpData(LoginUserName));
                             List<string> diffusers = BpStore.GetDifferentBPUser(30);
-                            TextDecoration.WriteLineCentered("Felhasználók, akiknél >30% eltérés van:");
+                            TextDecoration.WriteLineCentered("Felhasználók, akiknél nagyobb mint 30% eltérés van:");
                             foreach (var user in diffusers)
                             {
                                 TextDecoration.WriteLineCentered(user);
@@ -645,11 +644,22 @@ namespace PSZO_VernyomasMero
     /// </summary>
     internal class InputChecks
     {
-        public static DateTime IsValidDate(string dateInput)
+        /// <summary>
+        /// A dátum érvényességének ellenörzése
+        /// </summary>
+        /// <param name="dateInput">A dátum</param>
+        /// <param name="IfTrueThenToday">Ha igaz akkor ha a felhasználó nem ír be semmit akkor a mai dátumot veszi alapul</param>
+        /// <returns>a dátumot</returns>
+        public static DateTime IsValidDate(string dateInput,bool IfTrueThenToday)
         {
             DateTime date;
             while (!DateTime.TryParse(dateInput, out date))
             {
+                if (IfTrueThenToday && string.IsNullOrWhiteSpace(dateInput))
+                {
+                    date = DateTime.Now;
+                    return date;
+                }
                 Console.ForegroundColor = ConsoleColor.Red;
                 TextDecoration.WriteLineCentered("Nem jól adta meg a dátumot! Írja be újra: ",false);
                 Console.ForegroundColor = ConsoleColor.White;
@@ -657,6 +667,7 @@ namespace PSZO_VernyomasMero
             }
             return date;
         }
+
     }
     /// <summary>
     /// Olyan függvényeket tartalmaz amelyek a konzol szövegek dekorálására szolgálnak
