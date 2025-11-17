@@ -77,7 +77,7 @@ namespace PSZO_VernyomasMero
                                 {
                                     case "1":
                                         CreateBpSave(LoginUserName);
-                                        Console.WriteLine("Vérnyomásadat elmentve!");
+                                        WriteLineCentered("Vérnyomásadat elmentve!");
                                         Thread.Sleep(2000);
                                         break;
                                     case "2":
@@ -114,6 +114,11 @@ namespace PSZO_VernyomasMero
                         }
                     }
                 }
+                else if (choice == 3)
+                {
+                    Environment.Exit(0);
+                }
+
                 else
                 {
                     Console.WriteLine("Nincs ilyen menüpont!");
