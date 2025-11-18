@@ -300,6 +300,7 @@ namespace PSZO_VernyomasMero
                                 Console.ForegroundColor = ConsoleColor.Red;
                                 TextDecoration.WriteLineCentered("=== STATISZTIKÁK ===", false);
                                 TextDecoration.WriteLineCentered(BpStore.AverageBpData(LoginUserName));
+                                BpStore.PrintMaxMinBpValues(LoginUserName);
                                 List<string> diffusers = BpStore.GetDifferentBPUser(30);
                                 TextDecoration.WriteLineCentered("Felhasználók, akiknél nagyobb mint 30% eltérés van:");
                                 foreach (var user in diffusers)
@@ -546,6 +547,50 @@ namespace PSZO_VernyomasMero
                 return diffUsers;
             }
 
+            //max és minimum vérnyomás értékek összegyűjtése
+            public static int[] GetMaxMinBpValues(string username)
+            {
+                string[] userbpdata = ReadBpData(username);
+                int maxSys = 0;
+                int minSys = 0;
+                int maxDia = 0;
+                int minDia = 0;
+                int maxPul = 0;
+                int minPul = 0;
+
+                foreach (var line in userbpdata)
+                {
+                    string[] split = line.Split(';');
+                    int sys = int.Parse(split[2]);
+                    int dia = int.Parse(split[3]);
+                    int pul = int.Parse(split[4]);
+                    if (sys > maxSys)
+                    {
+                        maxSys = sys;
+                    }
+                    if (sys < minSys || minSys == 0)
+                    {
+                        minSys = sys;
+                    }
+                    if (dia > maxDia)
+                    {
+                        maxDia = dia;
+                    }
+                    if (dia < minDia || minDia == 0)
+                    {
+                        minDia = dia;
+                    }
+                    if (pul > maxPul)
+                    {
+                        maxPul = pul;
+                    }
+                    if (pul < minPul || minPul == 0)
+                    {
+                        minPul = pul;
+                    }
+                }
+                return new int[] { maxSys, minSys, maxDia, minDia, maxPul, minPul };
+            }
             /// <summary>
             /// Vérnyomás adatok kiírása táblázatos formában
             /// </summary>
@@ -571,6 +616,24 @@ namespace PSZO_VernyomasMero
                     TextDecoration.WriteLineCentered($"║ {date} ║ {sys} ║ {dia} ║ {pul} ║");
                 }
                 TextDecoration.WriteLineCentered("╚══════════════════════════════════════════╝");
+            }
+
+            public static void PrintMaxMinBpValues(string username)
+            {
+                int[] minmax = GetMaxMinBpValues(username);
+                int maxSys = minmax[0];
+                int minSys = minmax[1];
+                int maxDia = minmax[2];
+                int minDia = minmax[3];
+                int maxPul = minmax[4];
+                int minPul = minmax[5];
+                TextDecoration.WriteLineCentered("╔══════════════════╦════════╦════════╗");
+                TextDecoration.WriteLineCentered("║ Érték típusa     ║   MIN  ║   MAX  ║");
+                TextDecoration.WriteLineCentered("╠══════════════════╬════════╬════════╣");
+                TextDecoration.WriteLineCentered($"║ Szisztolés érték ║ {minSys.ToString().PadLeft(6)} ║ {maxSys.ToString().PadLeft(6)} ║");
+                TextDecoration.WriteLineCentered($"║ Diasztolés érték ║ {minDia.ToString().PadLeft(6)} ║ {maxDia.ToString().PadLeft(6)} ║");
+                TextDecoration.WriteLineCentered($"║ Pulzus érték     ║ {minPul.ToString().PadLeft(6)} ║ {maxPul.ToString().PadLeft(6)} ║");
+                TextDecoration.WriteLineCentered("╚══════════════════╩════════╩════════╝");
             }
 
 
