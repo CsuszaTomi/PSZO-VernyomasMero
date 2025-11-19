@@ -391,7 +391,7 @@ namespace PSZO_VernyomasMero
                 // KISZÁMOLJUK AZ ÉLETKORÁT
                 int age = DateTime.Now.Year - birthDate.Year;
                 int sysMin = 0;
-                int sysMax = 0;
+                int sysMax = 0; 
                 int diastMin = 0;
                 int diastMax = 0;
                 int bpmMin = 60;
@@ -527,6 +527,7 @@ namespace PSZO_VernyomasMero
                 foreach (string user in users)
                 {
                     cUserData = BpStore.ReadBpData(user);
+                    diffNum = 0;
 
                     if (cUserData.Length != 0)
                     {
@@ -546,7 +547,7 @@ namespace PSZO_VernyomasMero
                             }
                         }
 
-                        diffPercent = diffNum / cUserData.Length * 100;
+                        diffPercent = (double)diffNum / cUserData.Length * 100;
 
                         if (diffPercent < maxDiff || diffPercent > maxDiff)
                         {
