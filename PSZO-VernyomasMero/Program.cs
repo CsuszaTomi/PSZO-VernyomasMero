@@ -446,11 +446,27 @@ namespace PSZO_VernyomasMero
                 }
             }
 
-            /// <summary>
-            /// Visszaadja azon felhasználók listáját, akiknél a mérések meghatározott százaléka eltér a normálistól.
-            /// </summary>
-            /// <param name="maxDiff">A megengedett maximum eltérés százalékban</param>
-            /// <returns>Felhasználónevek listája</returns>
+            public static BpStore splitLine(string line)
+            {
+                string[] lineSplit = line.Split(';');
+
+                return new BpStore(lineSplit[0], DateTime.Parse(lineSplit[1]), int.Parse(lineSplit[2]), int.Parse(lineSplit[3]), int.Parse(lineSplit[4]));
+            }
+
+            
+            public static BpStore minFind(string username, char mode)
+            {
+                
+                if (mode == 's')
+                {
+                    
+                }
+
+
+                
+
+                return new BpStore();
+            }
 
             public static BpStore[] sortBpUni()
             {
@@ -460,6 +476,11 @@ namespace PSZO_VernyomasMero
                 return new BpStore[] { new BpStore() };
             }
 
+            /// <summary>
+            /// Visszaadja azon felhasználók listáját, akiknél a mérések meghatározott százaléka eltér a normálistól.
+            /// </summary>
+            /// <param name="maxDiff">A megengedett maximum eltérés százalékban</param>
+            /// <returns>Felhasználónevek listája</returns> 
             public static List<string> GetDifferentBPUser(double maxDiff)
             {
                 int diffNum = 0;
