@@ -611,7 +611,7 @@ namespace PSZO_VernyomasMero
                     string pul = split[4].PadLeft(5);
                     TextDecoration.WriteLineCentered($"║ {date} ║ {sys} ║ {dia} ║ {pul} ║");
                 }
-                TextDecoration.WriteLineCentered("╚══════════════════════════════════════════╝");
+                TextDecoration.WriteLineCentered("╚══════════════════╩═══════╩═══════╩═══════╝");
             }
 
             public static void PrintMaxMinBpValues(string username)
@@ -623,7 +623,9 @@ namespace PSZO_VernyomasMero
                 int minDia = minmax[3];
                 int maxPul = minmax[4];
                 int minPul = minmax[5];
+                Console.WriteLine(" ");
                 TextDecoration.WriteLineCentered("Személyes értékek");
+                Console.WriteLine(" ");
                 TextDecoration.WriteLineCentered("╔══════════════════╦════════╦════════╗");
                 TextDecoration.WriteLineCentered("║ Érték típusa     ║   MIN  ║   MAX  ║");
                 TextDecoration.WriteLineCentered("╠══════════════════╬════════╬════════╣");
@@ -642,7 +644,9 @@ namespace PSZO_VernyomasMero
                 int minDia = minmax[3];
                 int maxPul = minmax[4];
                 int minPul = minmax[5];
+                Console.WriteLine(" ");
                 TextDecoration.WriteLineCentered("Globális értékek");
+                Console.WriteLine(" ");
                 TextDecoration.WriteLineCentered("╔══════════════════╦════════╦════════╗");
                 TextDecoration.WriteLineCentered("║ Érték típusa     ║   MIN  ║   MAX  ║");
                 TextDecoration.WriteLineCentered("╠══════════════════╬════════╬════════╣");
@@ -650,6 +654,7 @@ namespace PSZO_VernyomasMero
                 TextDecoration.WriteLineCentered($"║ Diasztolés érték ║ {minDia.ToString().PadLeft(6)} ║ {maxDia.ToString().PadLeft(6)} ║");
                 TextDecoration.WriteLineCentered($"║ Pulzus érték     ║ {minPul.ToString().PadLeft(6)} ║ {maxPul.ToString().PadLeft(6)} ║");
                 TextDecoration.WriteLineCentered("╚══════════════════╩════════╩════════╝");
+                Console.WriteLine(" ");
             }
 
 
