@@ -650,7 +650,10 @@ namespace PSZO_VernyomasMero
             public static void PrintMaxMinBpValues(string username)
             {
                 int[] minmax = GetMaxMinBpValues(username);
-
+                int[] avg = AverageBpData(username);
+                int avgsys = avg[0];
+                int avgdia = avg[1];
+                int avgpul = avg[2];
                 int maxSys = minmax[0];
                 int minSys = minmax[1];
                 int maxDia = minmax[2];
@@ -660,13 +663,13 @@ namespace PSZO_VernyomasMero
                 Console.WriteLine(" ");
                 TextDecoration.WriteLineCentered("Személyes értékek");
                 Console.WriteLine(" ");
-                TextDecoration.WriteLineCentered("╔══════════════════╦════════╦════════╗");
-                TextDecoration.WriteLineCentered("║ Érték típusa     ║   MIN  ║   MAX  ║");
-                TextDecoration.WriteLineCentered("╠══════════════════╬════════╬════════╣");
-                TextDecoration.WriteLineCentered($"║ Szisztolés érték ║ {minSys.ToString().PadLeft(6)} ║ {maxSys.ToString().PadLeft(6)} ║");
-                TextDecoration.WriteLineCentered($"║ Diasztolés érték ║ {minDia.ToString().PadLeft(6)} ║ {maxDia.ToString().PadLeft(6)} ║");
-                TextDecoration.WriteLineCentered($"║ Pulzus érték     ║ {minPul.ToString().PadLeft(6)} ║ {maxPul.ToString().PadLeft(6)} ║");
-                TextDecoration.WriteLineCentered("╚══════════════════╩════════╩════════╝");
+                TextDecoration.WriteLineCentered("╔══════════════════╦════════╦════════╦═══════╗");
+                TextDecoration.WriteLineCentered("║ Érték típusa     ║   MIN  ║   MAX  ║  AVG  ║");
+                TextDecoration.WriteLineCentered("╠══════════════════╬════════╬════════╬═══════╣");
+                TextDecoration.WriteLineCentered($"║ Szisztolés érték ║ {minSys.ToString().PadLeft(6)} ║ {maxSys.ToString().PadLeft(6)} ║{avgsys.ToString().PadLeft(6)} ║");
+                TextDecoration.WriteLineCentered($"║ Diasztolés érték ║ {minDia.ToString().PadLeft(6)} ║ {maxDia.ToString().PadLeft(6)} ║{avgdia.ToString().PadLeft(6)} ║");
+                TextDecoration.WriteLineCentered($"║ Pulzus érték     ║ {minPul.ToString().PadLeft(6)} ║ {maxPul.ToString().PadLeft(6)} ║{avgpul.ToString().PadLeft(6)} ║");
+                TextDecoration.WriteLineCentered("╚══════════════════╩════════╩════════╩═══════╝");
             }
 
             public static void PrintMaxMinBpValuesGlobal()
