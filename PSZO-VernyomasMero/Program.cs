@@ -624,6 +624,7 @@ namespace PSZO_VernyomasMero
             public static void PrintMaxMinBpValues(string username)
             {
                 int[] minmax = GetMaxMinBpValues(username);
+
                 int maxSys = minmax[0];
                 int minSys = minmax[1];
                 int maxDia = minmax[2];
