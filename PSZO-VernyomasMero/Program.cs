@@ -40,7 +40,7 @@ namespace PSZO_VernyomasMero
                     case 0:
                         Console.Clear();
                         Console.ForegroundColor = ConsoleColor.Red;
-                        TextDecoration.WriteLineCentered("=== REGISZTRÁCIÓ === ", false);
+                        TextDecoration.WriteLineCentered("=== REGISZTRÁCIÓ ===", false);
                         Console.ForegroundColor = ConsoleColor.White;
                         RegisterUser(out UserName, out FullName, out Password, out BirthDate, out Gender);
                         User.AddUser(UserName, FullName, Password, BirthDate, Gender);
