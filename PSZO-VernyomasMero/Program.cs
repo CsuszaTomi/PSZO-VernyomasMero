@@ -21,19 +21,6 @@ namespace PSZO_VernyomasMero
     {
         static void Main(string[] args)
         {
-            BpStore[] bpstore = new BpStore[4];
-            BpStore[] bpSorted = sortBpUni('t', "Laci");
-
-            foreach (var item in bpSorted)
-            {
-                Console.WriteLine($"{item.user} {item.date} {item.sys} {item.dia} {item.pulse}");
-            }
-
-            Console.WriteLine();
-
-
-            Console.Read();
-
             string[] files = { "UserData.txt", "BpData.txt" };
             foreach (var item in files)
             {
