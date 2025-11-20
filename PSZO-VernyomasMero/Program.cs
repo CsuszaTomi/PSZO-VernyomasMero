@@ -7,10 +7,12 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Reflection.Metadata;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using static PSZO_VernyomasMero.Program;
 
 namespace PSZO_VernyomasMero
 {
@@ -69,8 +71,8 @@ namespace PSZO_VernyomasMero
                             }
                             else if (LoginUserName == "admin")
                             {
-                                LoggedIn("admin", LoggedInUser);
-                                LoggedInUser = User.Users[i];
+                                Admin.AdminPanel();                         
+                               LoggedInUser = User.Users[i];
                                 break;
                             }
                             else
@@ -275,7 +277,6 @@ namespace PSZO_VernyomasMero
                 string filePath = Path.Combine(projectPath, "BpData.txt");
                 File.AppendAllText(filePath, $"{user};{date.ToShortDateString()};{sys};{dia};{pulse}\n");
             }
-
 
             /// <summary>
             /// Vérnyomás adatainak összeállítása
@@ -748,7 +749,7 @@ namespace PSZO_VernyomasMero
             {
                 foreach (var user in Users)
                 {
-                    Console.WriteLine($"Felhasználónév: {user.UserName}, Teljes név: {user.FullName}, Születési dátum: {user.BirthDate.ToShortDateString()}, Nem: {user.Gender}");
+                    TextDecoration.WriteLineCentered($"Felhasználónév: {user.UserName}, Teljes név: {user.FullName}, Születési dátum: {user.BirthDate.ToShortDateString()}, Nem: {user.Gender}");
                 }
             }
 
@@ -873,6 +874,18 @@ namespace PSZO_VernyomasMero
                 }
                 Console.Write(new string(' ', leftPadding) + text);
             }
+            public static void LoadingAnimation(string message = "Mentés folyamatban", int durationMs = 1500)
+            {
+                WriteCentered($"{message}");
+                int steps = 5;
+                for (int i = 0; i < steps; i++)
+                {
+                    Console.Write(".");
+                    Thread.Sleep(durationMs / steps);
+                }
+                Console.Write("Kész");
+            }
+
         }
         /// <summary>
         /// Olyan függvényeket tarlamaz amelyek a konzol beállításaira szolgálnak
@@ -992,6 +1005,174 @@ namespace PSZO_VernyomasMero
                 } while (!selected);
                 return currentPoint;
             }
+        }
+
+        internal class Admin
+        {
+            public static void ShowUsers()
+            {
+                if (User.Users.Count == 0)
+                {
+                    TextDecoration.WriteLineCentered("Nincs adat");
+                    return;
+                }
+
+                TextDecoration.WriteLineCentered("╔════════════════════════════╦════════════════════════════╦═══════════════════╦═══════════════════╦═══════════════════╗");
+                TextDecoration.WriteLineCentered("║       Felhasználó név      ║         Teljes név         ║      Jelszó       ║  Születési dátum  ║       Neme        ║");
+                TextDecoration.WriteLineCentered("╠════════════════════════════╬════════════════════════════╬═══════════════════╬═══════════════════╬═══════════════════╣");
+
+                foreach (User user in User.Users)
+                {
+                    string userName = user.UserName.PadRight(26);
+                    string fullName = user.FullName.PadRight(26);
+                    string password = user.Password.PadRight(17);
+                    string birthDate = user.BirthDate.ToShortDateString().PadRight(17);
+                    string gender = user.Gender.PadRight(17);
+
+                    TextDecoration.WriteLineCentered($"║ {userName} ║ {fullName} ║ {password} ║ {birthDate} ║ {gender} ║");
+                }
+
+                TextDecoration.WriteLineCentered("╚════════════════════════════╩════════════════════════════╩═══════════════════╩═══════════════════╩═══════════════════╝");
+            }
+            public static void AdminPanel()
+            {
+                bool exit = false;
+                while (!exit)
+                {
+                    Console.Clear();
+                    int choice = MenuControll.ArrowMenu(new string[] { "Felhasználók listázása", "Felhasználó törlése", "Felhasználó adatainak módosítása", "Kilépés" }, "=== ADMIN PANEL ===");
+                    switch (choice)
+                    {
+                        case 0:
+                            Console.Clear();
+                            Admin.ShowUsers();
+                            Console.ForegroundColor = ConsoleColor.DarkRed;
+                            TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...", false);
+                            Console.ReadLine();
+                            break;
+
+                        case 1:
+                            Console.Clear();
+                            TextDecoration.WriteCentered("Adja meg a törlendő felhasználó nevét: ");
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            string delUser = Console.ReadLine();
+                            int checker = 0;
+                            for (int i = 0; i < User.Users.Count; i++)
+                            {
+                                if (delUser == User.Users[i].UserName)
+                                {
+                                    TextDecoration.LoadingAnimation("Felhasználó törlése folyamatban", 2000);
+                                    User.Users.RemoveAt(i);
+                                    User.SaveUserData();
+                                    string[] userbpdata = BpStore.ReadBpData(delUser);
+                                    string basePath = AppDomain.CurrentDomain.BaseDirectory;
+                                    string projectPath = Path.GetFullPath(Path.Combine(basePath, @"..\..\.."));
+                                    string filePath = Path.Combine(projectPath, "BpData.txt");
+                                    string[] allbpdata = File.ReadAllLines(filePath);
+                                    if (userbpdata.Length == 0)
+                                    {
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        for (int j = 0; j < allbpdata.Length; j++)
+                                        {
+                                            string[] split = allbpdata[j].Split(';');
+                                            if (split[0] == delUser)
+                                            {
+                                                allbpdata[j] = null;
+                                            }
+                                        }
+                                        List<string> newbpdata = new List<string>();
+                                        foreach (var line in allbpdata)
+                                        {
+                                            if (line != null)
+                                            {
+                                                newbpdata.Add(line);
+                                            }
+                                        }
+                                        File.WriteAllLines(filePath, newbpdata);
+                                    }
+                                }
+                                else
+                                {
+                                    checker++;
+                                    if (checker == User.Users.Count)
+                                    {
+                                        Console.ForegroundColor = ConsoleColor.Red;
+                                        TextDecoration.WriteLineCentered("Nincs ilyen felhasználó!", false);
+                                        Thread.Sleep(2000);
+                                    }
+                                }
+                            }
+                            break;
+
+                        case 2:
+                            Console.Clear();
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            TextDecoration.WriteLineCentered("=== FELHASZNÁLÓ MÓDOSÍTÁS", false);
+                            TextDecoration.WriteCentered("Adja meg a módosítandó felhasználó nevét: ");
+                            string editUser = Console.ReadLine();
+                            int checker2 = 0;
+                            for (int i = 0; i < User.Users.Count; i++)
+                            {
+                                if (editUser == User.Users[i].UserName)
+                                {
+                                    TextDecoration.WriteCentered("Adja meg az új felhasználó nevet: ");
+                                    string newUserName = Console.ReadLine();
+                                    if (newUserName != "")
+                                    {
+                                        User.Users[i].UserName = newUserName;
+                                    }
+                                    TextDecoration.WriteCentered("Adja meg az új teljes nevet: ");
+                                    string newFullName = Console.ReadLine();
+                                    if (newFullName != "")
+                                    {
+                                        User.Users[i].FullName = newFullName;
+                                    }
+                                    TextDecoration.WriteCentered("Adja meg az új jelszót: ");
+                                    string newPassword = Console.ReadLine();
+                                    if (newPassword != "")
+                                    {
+                                        User.Users[i].Password = newPassword;
+                                    }
+                                    TextDecoration.WriteCentered("Adja meg az új születési dátumot (ÉÉÉÉ-HH-NN): ");
+                                    string newBirthDateInput = Console.ReadLine();
+                                    if (newBirthDateInput != "")
+                                    {
+                                        DateTime newBirthDate = InputChecks.IsValidDate(newBirthDateInput, false);
+                                        User.Users[i].BirthDate = newBirthDate;
+                                    }
+                                    TextDecoration.WriteCentered("Adja meg az új nemet (Férfi/Nő): ");
+                                    string newGender = Console.ReadLine();
+                                    bool newGenderSpecified = false;
+                                    if (newGender != "")
+                                    {
+                                        User.Users[i].Gender = newGender;
+                                    }
+                                    User.SaveUserData();
+                                }
+                                else
+                                {
+                                    checker2++;
+                                    if (checker2 == User.Users.Count)
+                                    {
+                                        Console.ForegroundColor = ConsoleColor.Red;
+                                        TextDecoration.WriteLineCentered("Nincs ilyen felhasználó!", false);
+                                        Thread.Sleep(2000);
+                                    }
+                                }
+                            }
+                            break;
+
+                        case 3:
+                            exit = true;
+                            break;
+                    }
+                }
+            }
+        
+
         }
     }
 }
