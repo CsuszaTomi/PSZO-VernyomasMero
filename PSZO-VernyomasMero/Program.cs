@@ -21,6 +21,19 @@ namespace PSZO_VernyomasMero
     {
         static void Main(string[] args)
         {
+            BpStore[] bpstore = new BpStore[4];
+            BpStore[] bpSorted = sortBpUni('t', "Laci");
+
+            foreach (var item in bpSorted)
+            {
+                Console.WriteLine($"{item.user} {item.date} {item.sys} {item.dia} {item.pulse}");
+            }
+
+            Console.WriteLine();
+
+
+            Console.Read();
+
             string[] files = { "UserData.txt", "BpData.txt" };
             foreach (var item in files)
             {
@@ -390,9 +403,7 @@ namespace PSZO_VernyomasMero
 
                     // Console.WriteLine(sortedBpDatas[i].date);
 
-                    int toDelete = userBpDatas.IndexOf(sortedBpDatas[i]);
-
-                    userBpDatas.RemoveAt(toDelete);
+                    RemoveObjectFromList(userBpDatas, sortedBpDatas, i);
                 }
             }
             else
@@ -403,14 +414,22 @@ namespace PSZO_VernyomasMero
 
                     // Console.WriteLine(sortedBpDatas[i].date);
 
-                    int toDelete = userBpDatas.IndexOf(sortedBpDatas[i]);
-
-                    userBpDatas.RemoveAt(toDelete);
+                    RemoveObjectFromList(userBpDatas, sortedBpDatas, i);
                 }
             }
 
-
             return sortedBpDatas;
+        }
+
+        private static void RemoveObjectFromList(List<BpStore> userBpDatas, BpStore[] sortedBpDatas, int i)
+        {
+            for (int j = 0; j < userBpDatas.Count; j++)
+            {
+                if (sortedBpDatas[i] == userBpDatas[j])
+                {
+                    userBpDatas.RemoveAt(j);
+                }
+            }
         }
 
         /// <summary>
