@@ -299,6 +299,12 @@ namespace PSZO_VernyomasMero
                 this.dia = dia;
                 this.pulse = pulse;
             }
+
+            public BpStore()
+            {
+
+            }
+
             /// <summary>
             /// Vérnyomás értékek vizsgálata és állapot visszaadása
             /// </summary>
@@ -433,6 +439,15 @@ namespace PSZO_VernyomasMero
             /// </summary>
             /// <param name="maxDiff">A megengedett maximum eltérés százalékban</param>
             /// <returns>Felhasználónevek listája</returns>
+
+            public static BpStore[] sortBpUni()
+            {
+
+
+
+                return new BpStore[] { new BpStore() };
+            }
+
             public static List<string> GetDifferentBPUser(double maxDiff)
             {
                 int diffNum = 0;
