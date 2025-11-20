@@ -21,6 +21,19 @@ namespace PSZO_VernyomasMero
     {
         static void Main(string[] args)
         {
+            BpStore[] bpstore = new BpStore[4];
+            BpStore[] bpSorted = sortBpUni('p', "Laci", true);
+
+            foreach (var item in bpSorted)
+            {
+                Console.WriteLine($"{item.user} {item.date} {item.sys} {item.dia} {item.pulse}");
+            }
+
+            Console.WriteLine();
+
+
+            Console.Read();
+
             string[] files = { "UserData.txt", "BpData.txt" };
             foreach (var item in files)
             {
@@ -278,6 +291,141 @@ namespace PSZO_VernyomasMero
             }
         }
 
+        public static BpStore splitLine(string line)
+        {
+            string[] lineSplit = line.Split(';');
+
+            return new BpStore(lineSplit[0], DateTime.Parse(lineSplit[1]), int.Parse(lineSplit[2]), int.Parse(lineSplit[3]), int.Parse(lineSplit[4]));
+        }
+
+
+        public static BpStore minFind(string username, List<BpStore> BpArray, char mode)
+        {
+            BpStore min = BpArray[0];
+
+            for (int i = 0; i < BpArray.Count; i++)
+            {
+                if (mode == 't')
+                {
+                    if (BpArray[i].date < min.date)
+                    {
+                        min = BpArray[i];
+                    }
+                }
+                else if (mode == 's')
+                {
+                    if (BpArray[i].sys < min.sys)
+                    {
+                        min = BpArray[i];
+                    }
+                }
+                else if (mode == 'd')
+                {
+                    if (BpArray[i].dia < min.dia)
+                    {
+                        min = BpArray[i];
+                    }
+                }
+                else if (mode == 'p')
+                {
+                    if (BpArray[i].pulse < min.pulse)
+                    {
+                        min = BpArray[i];
+                    }
+                }
+            }
+
+            return min;
+        }
+
+        public static BpStore maxFind(string username, List<BpStore> BpArray, char mode)
+        {
+            BpStore max = BpArray[0];
+
+            for (int i = 0; i < BpArray.Count; i++)
+            {
+                if (mode == 't')
+                {
+                    if (BpArray[i].date > max.date)
+                    {
+                        max = BpArray[i];
+                    }
+                }
+                else if (mode == 's')
+                {
+                    if (BpArray[i].sys > max.sys)
+                    {
+                        max = BpArray[i];
+                    }
+                }
+                else if (mode == 'd')
+                {
+                    if (BpArray[i].dia > max.dia)
+                    {
+                        max = BpArray[i];
+                    }
+                }
+                else if (mode == 'p')
+                {
+                    if (BpArray[i].pulse > max.pulse)
+                    {
+                        max = BpArray[i];
+                    }
+                }
+            }
+
+            // Console.WriteLine(max.date);
+
+            return max;
+        }
+
+        public static BpStore[] sortBpUni(char mode, string username, bool asc = false)
+        {
+            string[] userBpDataRaw = BpStore.ReadBpData(username);
+
+            List<BpStore> userBpDatas = new List<BpStore> { };
+            BpStore[] sortedBpDatas = new BpStore[userBpDataRaw.Length];
+
+            BpStore bpData = new BpStore();
+
+            for (int i = 0; i < userBpDataRaw.Length; i++)
+            {
+                bpData = new BpStore(userBpDataRaw[i]);
+
+                userBpDatas.Add(bpData);
+            }
+
+            if (asc)
+            {
+                for (int i = 0; i < userBpDataRaw.Length; i++)
+                {
+                    sortedBpDatas[i] = maxFind(username, userBpDatas, mode);
+
+                    // Console.WriteLine(sortedBpDatas[i].date);
+
+                    int toDelete = userBpDatas.IndexOf(sortedBpDatas[i]);
+
+                    userBpDatas.RemoveAt(toDelete);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < userBpDataRaw.Length; i++)
+                {
+                    sortedBpDatas[i] = minFind(username, userBpDatas, mode);
+
+                    // Console.WriteLine(sortedBpDatas[i].date);
+
+                    int toDelete = userBpDatas.IndexOf(sortedBpDatas[i]);
+
+                    userBpDatas.RemoveAt(toDelete);
+                }
+            }
+
+
+            return sortedBpDatas;
+        }
+
         /// <summary>
         /// A VÉRNYOMÁS ADATAIT TÁROLJA(MÉRÉS IDEJE,EREDMÉNYE, qANY)
         /// </summary>
@@ -315,6 +463,17 @@ namespace PSZO_VernyomasMero
                 this.sys = sys;
                 this.dia = dia;
                 this.pulse = pulse;
+            }
+
+            public BpStore(string line)
+            {
+                string[] lineSplit = line.Split(';');
+
+                this.user = lineSplit[0];
+                this.date = DateTime.Parse(lineSplit[1]);
+                this.sys = int.Parse(lineSplit[2]);
+                this.dia = int.Parse(lineSplit[3]);
+                this.pulse = int.Parse(lineSplit[4]);
             }
 
             public BpStore()
@@ -449,38 +608,6 @@ namespace PSZO_VernyomasMero
                 {
                     return [];
                 }
-            }
-
-            public static BpStore splitLine(string line)
-            {
-                string[] lineSplit = line.Split(';');
-
-                return new BpStore(lineSplit[0], DateTime.Parse(lineSplit[1]), int.Parse(lineSplit[2]), int.Parse(lineSplit[3]), int.Parse(lineSplit[4]));
-            }
-
-            
-            public static BpStore minFind(string username, char mode)
-            {      
-
-                return new BpStore();
-            }
-
-            public static BpStore[] sortBpUni(char mode, bool asc = false, string username)
-            {
-                if (asc)
-                {
-
-                }
-                else
-                {
-                    foreach (var item in username)
-                    {
-                        
-                    }
-                }
-
-
-                    return new BpStore[] { new BpStore() };
             }
 
             /// <summary>
