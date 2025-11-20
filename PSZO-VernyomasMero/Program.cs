@@ -271,6 +271,7 @@ namespace PSZO_VernyomasMero
                 TextDecoration.WriteCentered("Pulzus (bpm): ");
                 int pul = int.Parse(Console.ReadLine());
                 TextDecoration.WriteLineCentered(BpStore.InspectBP(CurrentUser.BirthDate, sys, dia, pul));
+                    
                 BpStore newBpData = new BpStore(userName, date, sys, dia, pul);
                 newBpData.SaveBpData();
             }
@@ -460,7 +461,7 @@ namespace PSZO_VernyomasMero
                 }
 
                 // SZISZTÓLIKUS_ÁLLAPOTA;DIASZTÓLIKUS_ÁLLAPOTA;PULZUS_ÁLLAPOTA
-                return $"{sysStatus};{diastStatus};{bpmStatus}";
+                return $"Szisztólikus: {sysStatus}, Diasztólikus: {diastStatus}, Pulzus: {bpmStatus}";
             }
 
             /// <summary>
