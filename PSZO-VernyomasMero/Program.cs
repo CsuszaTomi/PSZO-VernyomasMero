@@ -40,7 +40,7 @@ namespace PSZO_VernyomasMero
                     case 0:
                         Console.Clear();
                         Console.ForegroundColor = ConsoleColor.Red;
-                        TextDecoration.WriteLineCentered("=== REGISZTRÁCIÓ === ", false);
+                        TextDecoration.WriteLineCentered("=== REGISZTRÁCIÓ ===", false);
                         Console.ForegroundColor = ConsoleColor.White;
                         RegisterUser(out UserName, out FullName, out Password, out BirthDate, out Gender);
                         User.AddUser(UserName, FullName, Password, BirthDate, Gender);
@@ -263,7 +263,7 @@ namespace PSZO_VernyomasMero
                     DateTime date;
 
                 TextDecoration.WriteCentered("Dátum: ");
-                date = InputChecks.IsValidDate(Console.ReadLine());
+                date = InputChecks.IsValidDate(Console.ReadLine(), true);
                 TextDecoration.WriteCentered("Szisztolés érték (Hgmm): ");
                 int sys = int.Parse(Console.ReadLine());
                 TextDecoration.WriteCentered("Diasztolés érték (Hgmm): ");
@@ -1030,7 +1030,7 @@ namespace PSZO_VernyomasMero
                     Console.Clear();
                     Console.ForegroundColor = ConsoleColor.Red;
                     TextDecoration.WriteLineCentered(title,false);
-                    TextDecoration.WriteLineCentered("-------------------");
+                    TextDecoration.WriteLineCentered("--------------------");
                     for (int i = 0; i < menupoints.Length; i++)
                     {
                         if (i == currentPoint)
@@ -1043,7 +1043,7 @@ namespace PSZO_VernyomasMero
                             TextDecoration.WriteLineCentered($"  {menupoints[i]}");
                         }
                     }
-                    TextDecoration.WriteLineCentered("-------------------");
+                    TextDecoration.WriteLineCentered("--------------------");
                     switch (Console.ReadKey(true).Key)
                     {
                         case ConsoleKey.Enter:
