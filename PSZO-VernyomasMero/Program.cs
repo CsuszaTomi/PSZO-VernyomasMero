@@ -19,11 +19,11 @@ namespace PSZO_VernyomasMero
         static void Main(string[] args)
         {
             string[] files = { "UserData.txt", "BpData.txt" };
-            foreach (var file in files)
+            foreach (var item in files)
             {
-                if (!File.Exists(file))
+                if (!File.Exists(item))
                 {
-                    Console.WriteLine("UserData és BpData nem létezik!");
+                    Console.WriteLine("UserData vagy BpData nem létezik!");
                     Console.ReadLine();
                     Environment.Exit(0);
                 }
