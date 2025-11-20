@@ -210,6 +210,7 @@ namespace PSZO_VernyomasMero
                                 Console.Clear();
                                 Console.ForegroundColor = ConsoleColor.Red;
                                 TextDecoration.WriteLineCentered("=== VÉRNYOMÁS RÖGZÍTÉSE ===", false);
+                                Console.WriteLine(" ");
                                 RegisterBP(LoginUserName, CurrentUser);
                                 Console.ForegroundColor = ConsoleColor.Green;
                                 TextDecoration.WriteLineCentered("Vérnyomásadat elmentve!", false);
@@ -217,9 +218,13 @@ namespace PSZO_VernyomasMero
                                 Console.ReadLine();
                                 break;
                             case 1:
+                                Console.Clear();
                                 string[] bpuserdata = BpStore.ReadBpData(LoginUserName);
-                                TextDecoration.WriteLineCentered("Saját mérései:");
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                TextDecoration.WriteLineCentered("=== SAJÁT MÉRÉSEK ===", false);
+                                Console.WriteLine(" ");
                                 BpStore.PrintBpTable(LoginUserName);
+                                Console.WriteLine(" ");
                                 TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
                                 Console.ReadLine();
                                 break;
@@ -235,6 +240,7 @@ namespace PSZO_VernyomasMero
                                 {
                                     TextDecoration.WriteLineCentered(user);
                                 }
+                                TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
                                 Console.ReadLine();
                                 break;
                             case 3:
@@ -644,6 +650,7 @@ namespace PSZO_VernyomasMero
             public static void PrintMaxMinBpValues(string username)
             {
                 int[] minmax = GetMaxMinBpValues(username);
+
                 int maxSys = minmax[0];
                 int minSys = minmax[1];
                 int maxDia = minmax[2];
@@ -772,6 +779,7 @@ namespace PSZO_VernyomasMero
                     Users.Add(NewUser);
                 }
             }
+            
             /// <summary>
             /// Felhasználók felsorolása
             /// </summary>
@@ -934,7 +942,7 @@ namespace PSZO_VernyomasMero
                 {
                     case 0:
                         Console.Clear();
-                        int colorswitcher = MenuControll.ArrowMenu(new string[] { "Fekete háttér, fehér betűszín", "Fehér háttér, fekete betűszín", "Sötétkék háttér, cián betűszín"}, "=== HÁTTÉRSZÍN BEÁLLÍTÁSA ===");
+                        int colorswitcher = MenuControll.ArrowMenu(new string[] { "Fekete háttér, fehér betűszín", "Fehér háttér, fekete betűszín", "Sötétkék háttér, cián betűszín", "Vissza"}, "=== HÁTTÉRSZÍN BEÁLLÍTÁSA ===");
                         switch (colorswitcher)
                         {
                             case 0:
@@ -950,12 +958,10 @@ namespace PSZO_VernyomasMero
                                 fgcolor = "c";
                                 break;
                             case 3:
-                                Console.BackgroundColor = ConsoleColor.DarkGreen;
-                                fgcolor = "y";
                                 break;
                         }
                         break;
-                    case 1:
+                    case 2:
                         break;
                 }
             }
@@ -975,10 +981,6 @@ namespace PSZO_VernyomasMero
                 else if (fgcolor == "c")
                 {
                     Console.ForegroundColor = ConsoleColor.Cyan;
-                }
-                else if (fgcolor == "dr")
-                {
-                    //Console.ForegroundColor = ConsoleColor.;
                 }
             }
         }
