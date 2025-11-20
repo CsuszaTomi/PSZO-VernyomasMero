@@ -399,7 +399,7 @@ namespace PSZO_VernyomasMero
             /// Átlagos vérnyomás adatok számítása
             /// </summary>
             /// <returns></returns>
-            public static string AverageBpData(string Username)
+            public static int[] AverageBpData(string Username)
             {
                 string[] Data = ReadBpData(Username);
                 int sumsys = 0;
@@ -421,11 +421,11 @@ namespace PSZO_VernyomasMero
                     sumsys /= Data.Length;
                     sumdia /= Data.Length;
                     sumpul /= Data.Length;
-                    return $"Átlagos értékek - Szisztolés: {sumsys} Hgmm, Diasztolés: {sumdia} Hgmm, Pulzus: {sumpul} bpm.";
+                    return [sumsys, sumdia, sumpul];
                 }
                 else
                 {
-                    return "Nincs elég adat az átlag számításhoz.";
+                    return [];
                 }
             }
 
@@ -710,7 +710,7 @@ namespace PSZO_VernyomasMero
         }
 
         /// <summary>
-        /// A FELHASZNÁLÓ ÉS ANNAK ADATAaaI
+        /// A FELHASZNÁLÓ ÉS ANNAK ADATAI
         /// </summary>
         internal class User
         {
@@ -954,18 +954,17 @@ namespace PSZO_VernyomasMero
                 }
             }
         }
-
         /// <summary>
-        /// 
+        /// Menü kezelő osztály
         /// </summary>
         internal class MenuControll
         {
             /// <summary>
-            /// 
+            /// Menü kezelő függvény
             /// </summary>
-            /// <param name="menupoints">Menüpontok amiket létrehoz a választáshoz</param>
-            /// <param name="title">A cím</param>
-            /// <returns>Egy menüt</returns>
+            /// <param name="menupoints">Menüpontok amiket létrehoz</param>
+            /// <param name="title">A menü címe</param>
+            /// <returns></returns>
             public static int ArrowMenu(string[] menupoints, string title)
             {
                 int currentPoint = 0;
@@ -1009,8 +1008,14 @@ namespace PSZO_VernyomasMero
             }
         }
 
+        /// <summary>
+        /// Adminisztrátori funkciókat tartalmazó osztály
+        /// </summary>
         internal class Admin
         {
+            /// <summary>
+            /// Felhasználók listázása táblázatos formában
+            /// </summary>
             public static void ShowUsers()
             {
                 if (User.Users.Count == 0)
@@ -1036,6 +1041,9 @@ namespace PSZO_VernyomasMero
 
                 TextDecoration.WriteLineCentered("╚════════════════════════════╩════════════════════════════╩═══════════════════╩═══════════════════╩═══════════════════╝");
             }
+            /// <summary>
+            /// Admin panel menü
+            /// </summary>
             public static void AdminPanel()
             {
                 bool exit = false;
@@ -1046,6 +1054,7 @@ namespace PSZO_VernyomasMero
                     switch (choice)
                     {
                         case 0:
+                            // Felhasználók listázása
                             Console.Clear();
                             Admin.ShowUsers();
                             Console.ForegroundColor = ConsoleColor.DarkRed;
@@ -1054,6 +1063,7 @@ namespace PSZO_VernyomasMero
                             break;
 
                         case 1:
+                            // Felhasználó törlése
                             Console.Clear();
                             TextDecoration.WriteCentered("Adja meg a törlendő felhasználó nevét: ");
                             Console.ForegroundColor = ConsoleColor.Red;
@@ -1061,10 +1071,11 @@ namespace PSZO_VernyomasMero
                             int checker = 0;
                             for (int i = 0; i < User.Users.Count; i++)
                             {
+                                // Törlés
                                 if (delUser == User.Users[i].UserName)
                                 {
                                     TextDecoration.LoadingAnimation("Felhasználó törlése folyamatban", 2000);
-                                    User.Users.RemoveAt(i);
+                                    User.Users.RemoveAt(i);// Felhasználó törlése a listából
                                     User.SaveUserData();
                                     string[] userbpdata = BpStore.ReadBpData(delUser);
                                     string basePath = AppDomain.CurrentDomain.BaseDirectory;
@@ -1082,7 +1093,7 @@ namespace PSZO_VernyomasMero
                                             string[] split = allbpdata[j].Split(';');
                                             if (split[0] == delUser)
                                             {
-                                                allbpdata[j] = null;
+                                                allbpdata[j] = null;// Felhasználó vérnyomás adatainak törlése
                                             }
                                         }
                                         List<string> newbpdata = new List<string>();
@@ -1110,6 +1121,7 @@ namespace PSZO_VernyomasMero
                             break;
 
                         case 2:
+                            // Felhasználó adatainak módosítása
                             Console.Clear();
                             Console.ForegroundColor = ConsoleColor.Red;
                             TextDecoration.WriteLineCentered("=== FELHASZNÁLÓ MÓDOSÍTÁS", false);
@@ -1173,8 +1185,6 @@ namespace PSZO_VernyomasMero
                     }
                 }
             }
-        
-
         }
     }
 }
