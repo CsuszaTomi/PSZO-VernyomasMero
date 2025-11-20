@@ -455,25 +455,27 @@ namespace PSZO_VernyomasMero
 
             
             public static BpStore minFind(string username, char mode)
-            {
-                
-                if (mode == 's')
-                {
-                    
-                }
-
-
-                
+            {      
 
                 return new BpStore();
             }
 
-            public static BpStore[] sortBpUni()
+            public static BpStore[] sortBpUni(char mode, bool asc = false, string username)
             {
+                if (asc)
+                {
+
+                }
+                else
+                {
+                    foreach (var item in username)
+                    {
+                        
+                    }
+                }
 
 
-
-                return new BpStore[] { new BpStore() };
+                    return new BpStore[] { new BpStore() };
             }
 
             /// <summary>
