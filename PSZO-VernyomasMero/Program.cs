@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Reflection.Metadata;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -224,9 +225,20 @@ namespace PSZO_VernyomasMero
                                 TextDecoration.WriteLineCentered("=== SAJÁT MÉRÉSEK ===", false);
                                 Console.WriteLine(" ");
                                 BpStore.PrintBpTable(LoginUserName);
-                                Console.WriteLine(" ");
-                                TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
-                                Console.ReadLine();
+                                int userdatachoice = MenuControll.ArrowMenuWithTable(new string[] { "Dátom alapján rendezés", "Érték nagyság alapú rendezés","Vissza" }, "Rendezés", () => BpStore.PrintBpTable(LoginUserName));
+                                switch(userdatachoice)
+                                {
+                                    case 0:
+                                        TextDecoration.WriteLineCentered("Még nem elérhető!", false);
+                                        TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
+                                        break;
+                                    case 1:
+                                        TextDecoration.WriteLineCentered("Még nem elérhető!", false);
+                                        TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
+                                        break;
+                                    case 2:
+                                        break;
+                                }
                                 break;
                             case 2:
                                 Console.Clear();
@@ -304,6 +316,12 @@ namespace PSZO_VernyomasMero
                 this.dia = dia;
                 this.pulse = pulse;
             }
+
+            public BpStore()
+            {
+
+            }
+
             /// <summary>
             /// Vérnyomás értékek vizsgálata és állapot visszaadása
             /// </summary>
@@ -433,11 +451,43 @@ namespace PSZO_VernyomasMero
                 }
             }
 
+            public static BpStore splitLine(string line)
+            {
+                string[] lineSplit = line.Split(';');
+
+                return new BpStore(lineSplit[0], DateTime.Parse(lineSplit[1]), int.Parse(lineSplit[2]), int.Parse(lineSplit[3]), int.Parse(lineSplit[4]));
+            }
+
+            
+            public static BpStore minFind(string username, char mode)
+            {      
+
+                return new BpStore();
+            }
+
+            public static BpStore[] sortBpUni(char mode, bool asc = false, string username)
+            {
+                if (asc)
+                {
+
+                }
+                else
+                {
+                    foreach (var item in username)
+                    {
+                        
+                    }
+                }
+
+
+                    return new BpStore[] { new BpStore() };
+            }
+
             /// <summary>
             /// Visszaadja azon felhasználók listáját, akiknél a mérések meghatározott százaléka eltér a normálistól.
             /// </summary>
             /// <param name="maxDiff">A megengedett maximum eltérés százalékban</param>
-            /// <returns>Felhasználónevek listája</returns>
+            /// <returns>Felhasználónevek listája</returns> 
             public static List<string> GetDifferentBPUser(double maxDiff)
             {
                 int diffNum = 0;
@@ -945,7 +995,7 @@ namespace PSZO_VernyomasMero
             /// <returns></returns>
             public static void SettingsMenu()
             {
-                int settingchoose = MenuControll.ArrowMenu(new string[] { "Téma kiválasztása", "Vissza"}, "=== BEÁLLÍTÁSOK ===");
+                int settingchoose = MenuControll.ArrowMenu(new string[] { "Téma kiválasztása","Program beállítások", "Fiók beállítások", "Vissza"}, "=== BEÁLLÍTÁSOK ===");
                 switch (settingchoose)
                 {
                     case 0:
@@ -969,7 +1019,23 @@ namespace PSZO_VernyomasMero
                                 break;
                         }
                         break;
+                    case 1:
+                        {
+                            Console.Clear();
+                            TextDecoration.WriteLineCentered("Nincsenek elérhető program beállítások!", false);
+                            TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
+                            Console.ReadLine();
+                            break;
+                        }
                     case 2:
+                        {
+                            Console.Clear();
+                            TextDecoration.WriteLineCentered("Nincsenek elérhető fiók beállítások!", false);
+                            TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
+                            Console.ReadLine();
+                            break;
+                        }
+                    case 3:
                         break;
                 }
             }
@@ -1019,6 +1085,48 @@ namespace PSZO_VernyomasMero
                         {
                             Console.ForegroundColor = ConsoleColor.Green;
                             TextDecoration.WriteLineCentered($"> {menupoints[i]}",false);
+                        }
+                        else
+                        {
+                            TextDecoration.WriteLineCentered($"  {menupoints[i]}");
+                        }
+                    }
+                    TextDecoration.WriteLineCentered("--------------------");
+                    switch (Console.ReadKey(true).Key)
+                    {
+                        case ConsoleKey.Enter:
+                            selected = true;
+                            break;
+                        case ConsoleKey.UpArrow:
+                            if (currentPoint > 0) currentPoint--;
+                            break;
+                        case ConsoleKey.DownArrow:
+                            if (currentPoint < menupoints.Length - 1) currentPoint++;
+                            break;
+                        default:
+                            Console.Beep();
+                            break;
+                    }
+                } while (!selected);
+                return currentPoint;
+            }
+            public static int ArrowMenuWithTable(string[] menupoints, string title,Action TableWriteFunction)
+            {
+                int currentPoint = 0;
+                bool selected = false;
+                do
+                {
+                    Console.Clear();
+                    TableWriteFunction();
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    TextDecoration.WriteLineCentered(title, false);
+                    TextDecoration.WriteLineCentered("--------------------");
+                    for (int i = 0; i < menupoints.Length; i++)
+                    {
+                        if (i == currentPoint)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            TextDecoration.WriteLineCentered($"> {menupoints[i]}", false);
                         }
                         else
                         {
