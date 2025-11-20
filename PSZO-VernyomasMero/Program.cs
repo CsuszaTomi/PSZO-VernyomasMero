@@ -31,7 +31,7 @@ namespace PSZO_VernyomasMero
             User.CollectUserData();
             while (true)
             {
-                string[] MainMenu = { "Regisztrálás", "Bejelentkezés", "Beállítások", "Kilépés" };
+                string[] MainMenu = { "Fiók létrehozása ", "Bejelentkezés", "Beállítások", "Kilépés" };
                 int mainmenuchoice = MenuControll.ArrowMenu(MainMenu, "=== VÉRNYOMÁSNAPLÓ ===");
                 string UserName, FullName, Password, Gender;
                 DateTime BirthDate;
@@ -95,90 +95,6 @@ namespace PSZO_VernyomasMero
                         Environment.Exit(0);
                         break;
                 }
-                //    Console.Clear();
-                //    int choice = 0;
-                //    Console.ForegroundColor = ConsoleColor.Red;
-                //    TextDecoration.WriteLineCentered("=== VÉRNYOMÁSNAPLÓ ===", false);
-                //    Console.ForegroundColor = ConsoleColor.White;
-                //    TextDecoration.WriteLineCentered("-------------------");
-                //    TextDecoration.WriteLineCentered("1. Regisztrálás");
-                //    TextDecoration.WriteLineCentered("2. Bejelentkezés");
-                //    TextDecoration.WriteLineCentered("3. Beállítások");
-                //    TextDecoration.WriteLineCentered("4. Kilépés");
-                //    TextDecoration.WriteLineCentered("--------------------");
-                //    TextDecoration.WriteCentered("Válasszon ki egy menüpontot: ");
-                //    while (!int.TryParse(Console.ReadLine(), out choice))
-                //    {
-                //    }
-                //    string UserName, FullName, Password, Gender;
-                //    DateTime BirthDate;
-                //    if (choice == 1)
-                //    {
-                //        Console.Clear();
-                //        Console.ForegroundColor = ConsoleColor.Red;
-                //        TextDecoration.WriteLineCentered("=== REGISZTRÁCIÓ === ", false);
-                //        Console.ForegroundColor = ConsoleColor.White;
-                //        RegisterUser(out UserName, out FullName, out Password, out BirthDate, out Gender);
-                //        User.AddUser(UserName, FullName, Password, BirthDate, Gender);
-                //        User.ShowUsers();
-                //        User.SaveUserData();
-                //    }
-                //    else if (choice == 2)
-                //    {
-                //        User LoggedInUser = new User();
-                //        Console.Clear();
-                //        Console.ForegroundColor = ConsoleColor.Red;
-                //        TextDecoration.WriteLineCentered("=== BEJELENTKEZÉS ===", false);
-                //        Console.ForegroundColor = ConsoleColor.White;
-                //        Console.WriteLine(" ");
-                //        TextDecoration.WriteCentered("Adja meg a felhasználó nevét: ");
-                //        string LoginUserName = Console.ReadLine();
-                //        TextDecoration.WriteCentered("Adja meg a jelszavát: ");
-                //        string LoginPassword = Console.ReadLine();
-                //        int check = 0;
-                //        for (int i = 0; i < User.Users.Count; i++)
-                //        {
-                //            if (User.Users[i].UserName == LoginUserName && User.Users[i].Password == LoginPassword)
-                //            {
-                //                LoggedIn(LoginUserName, LoggedInUser);
-                //                LoggedInUser = User.Users[i];
-                //                break;
-                //            }
-                //            else if (LoginUserName == "admin")
-                //            {
-                //                LoggedIn("admin", LoggedInUser);
-                //                LoggedInUser = User.Users[i];
-                //                break;
-                //            }
-                //            else
-                //            {
-                //                check++;
-                //                if (check == User.Users.Count)
-                //                {
-                //                    Console.ForegroundColor = ConsoleColor.DarkRed;
-                //                    TextDecoration.WriteLineCentered("Sikertelen bejelentkezés!", false);
-                //                    Console.ForegroundColor = ConsoleColor.White;
-                //                    Thread.Sleep(2000);
-                //                    break;
-                //                }
-                //            }
-                //        }
-                //    }
-                //    else if (choice == 3)
-                //    {
-                //        Console.Clear();
-                //        Settings.SettingsMenu();
-                //    }
-                //    else if (choice == 4)
-                //    {
-                //        Environment.Exit(0);
-                //    }
-                //    else
-                //    {
-                //        Console.ForegroundColor = ConsoleColor.Red;
-                //        TextDecoration.WriteLineCentered("Nincs ilyen menüpont!", false);
-                //    }
-                //}
 
                 // Felhasználó regisztráció
                 static void RegisterUser(out string UserName, out string FullName, out string Password, out DateTime BirthDate, out string Gender)
@@ -259,76 +175,84 @@ namespace PSZO_VernyomasMero
                 // Vérnyomás adatainak rögzítése
                 static void RegisterBP(string userName, User CurrentUser)
                 {
-                    string bloodPressureLevel = "";
                     DateTime date;
 
-                TextDecoration.WriteCentered("Dátum: ");
-                date = InputChecks.IsValidDate(Console.ReadLine(), true);
-                TextDecoration.WriteCentered("Szisztolés érték (Hgmm): ");
-                int sys = int.Parse(Console.ReadLine());
-                TextDecoration.WriteCentered("Diasztolés érték (Hgmm): ");
-                int dia = int.Parse(Console.ReadLine());
-                TextDecoration.WriteCentered("Pulzus (bpm): ");
-                int pul = int.Parse(Console.ReadLine());
-                TextDecoration.WriteLineCentered(BpStore.InspectBP(CurrentUser.BirthDate, sys, dia, pul));
-                    
-                BpStore newBpData = new BpStore(userName, date, sys, dia, pul);
-                newBpData.SaveBpData();
-            }
-
-            static void LoggedIn(string LoginUserName,User CurrentUser)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                TextDecoration.WriteLineCentered("Sikeres bejelentkezés!", false);
-                Console.ForegroundColor = ConsoleColor.White;
-                Thread.Sleep(2000);
-                bool exit = false;
-                while (!exit)
+                    TextDecoration.WriteCentered("Dátum: ");
+                    date = InputChecks.IsValidDate(Console.ReadLine(), true);
+                    TextDecoration.WriteCentered("Szisztolés érték (Hgmm): ");
+                    int sys = int.Parse(Console.ReadLine());
+                    TextDecoration.WriteCentered("Diasztolés érték (Hgmm): ");
+                    int dia = int.Parse(Console.ReadLine());
+                    TextDecoration.WriteCentered("Pulzus (bpm): ");
+                    int pul = int.Parse(Console.ReadLine());
+                    TextDecoration.WriteLineCentered(BpStore.InspectBP(CurrentUser.BirthDate, sys, dia, pul));
+                    BpStore newBpData = new BpStore(userName, date, sys, dia, pul);
+                    newBpData.SaveBpData();
+                }
+                // Bejelentkezés utáni menü
+                static void LoggedIn(string LoginUserName, User CurrentUser)
                 {
-                    Console.Clear();
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
-                    TextDecoration.WriteLineCentered($"Üdvözöljük, {LoginUserName}!", false);
-                    TextDecoration.WriteLineCentered("--------------------");
-                    TextDecoration.WriteLineCentered("1. Vérnyomás rögzítése");
-                    TextDecoration.WriteLineCentered("2. Saját mérések megtekintése");
-                    TextDecoration.WriteLineCentered("3. Kijelentkezés");
-                    TextDecoration.WriteLineCentered("--------------------");
-                    TextDecoration.WriteCentered("Válasszon: ");
-                    string choice2 = Console.ReadLine();
-                    switch (choice2)
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    TextDecoration.WriteLineCentered("Sikeres bejelentkezés!", false);
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Thread.Sleep(2000);
+                    bool exit = false;
+                    while (!exit)
                     {
-                        case "1":
-                            Console.Clear();
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            TextDecoration.WriteLineCentered("=== VÉRNYOMÁS RÖGZÍTÉSE ===", false);
-                            RegisterBP(LoginUserName, CurrentUser);
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            TextDecoration.WriteLineCentered("Vérnyomásadat elmentve!", false);
-                            Thread.Sleep(4000);
-                            break;
-                        case "2":
-                            var bpuserdata = BpStore.ReadBpData(LoginUserName);
-                            TextDecoration.WriteLineCentered("Saját mérései:");
-                            foreach (var item in bpuserdata)
-                            {
-                                TextDecoration.WriteLineCentered(item);
-                            }
-                            TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
-                            Console.ReadLine();
-                            break;
-                        case "3":
-                            exit = true;
-                            break;
-                        default:
-                            Console.ForegroundColor = ConsoleColor.Red;
-                            TextDecoration.WriteLineCentered("Nincs ilyen menüpont!", false);
-                            Thread.Sleep(2000);
-                            break;
+                        Console.Clear();
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        int loggedinchoose = MenuControll.ArrowMenu(new string[] { "Vérnyomás rögzítése", "Saját mérések megtekintése", "Statisztikák", "Beállítások", "Kijelentkezés" }, $"Üdvözöljük, {LoginUserName}!");
+                        switch (loggedinchoose)
+                        {
+                            case 0:
+                                Console.Clear();
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                TextDecoration.WriteLineCentered("=== VÉRNYOMÁS RÖGZÍTÉSE ===", false);
+                                RegisterBP(LoginUserName, CurrentUser);
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                TextDecoration.WriteLineCentered("Vérnyomásadat elmentve!", false);
+                                TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
+                                Console.ReadLine();
+                                break;
+                            case 1:
+                                string[] bpuserdata = BpStore.ReadBpData(LoginUserName);
+                                TextDecoration.WriteLineCentered("Saját mérései:");
+                                BpStore.PrintBpTable(LoginUserName);
+                                TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
+                                Console.ReadLine();
+                                break;
+                            case 2:
+                                Console.Clear();
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                TextDecoration.WriteLineCentered("=== STATISZTIKÁK ===", false);
+                                TextDecoration.WriteLineCentered(BpStore.AverageBpData(LoginUserName));
+                                BpStore.PrintMaxMinBpValues(LoginUserName);
+                                BpStore.PrintMaxMinBpValuesGlobal();
+                                List<string> diffusers = BpStore.GetDifferentBPUser(30);
+                                TextDecoration.WriteLineCentered("Felhasználók, akiknél nagyobb mint 30% eltérés van:");
+                                foreach (var user in diffusers)
+                                {
+                                    TextDecoration.WriteLineCentered(user);
+                                }
+                                Console.ReadLine();
+                                break;
+                            case 3:
+                                Console.Clear();
+                                Settings.SettingsMenu();
+                                continue;
+                            case 4:
+                                exit = true;
+                                break;
+                            default:
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                TextDecoration.WriteLineCentered("Nincs ilyen menüpont!", false);
+                                Thread.Sleep(2000);
+                                break;
+                        }
                     }
                 }
             }
         }
-    }
 
         /// <summary>
         /// A VÉRNYOMÁS ADATAIT TÁROLJA(MÉRÉS IDEJE,EREDMÉNYE, qANY)
