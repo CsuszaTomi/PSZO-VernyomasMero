@@ -366,6 +366,13 @@ namespace PSZO_VernyomasMero
             return max;
         }
 
+        /// <summary>
+        /// SORBA RENDEZI A MEGADOTT FELHASZNÁLÓ ADATAIT A KÉRT ADAT SZERINT (DÁTUM // SZISZTOLIKUS, DIASZTOLIKUS, VAGY PULZUS ÉRTÉKE SZERINT) [A mode paraméterben választhatja ki a kért adatot (később részletezve lesz)]
+        /// </summary>
+        /// <param name="mode">A PARAMÉTER AMI SZERINT A SORBA RENDEZÉS TÖRTÉNIK t: dátum szerint; d: diasztolikus érték szerint; s: szisztolikus érték szerint; p: pulzus szerint</param>
+        /// <param name="username">FELHASZNÁLÓ FELHASZNÁLÓNEVE AKINÉL A SORBARENDEZÉSNEK TÖRTÉNNIE KELL</param>
+        /// <param name="asc">NÖVEKVŐ SORREND ENGEDÉLYEZÉSE: false(alapértelmezett) -> csökkenő; true -> növekvő</param>
+        /// <returns></returns>
         public static BpStore[] sortBpUni(char mode, string username, bool asc = false)
         {
             string[] userBpDataRaw = BpStore.ReadBpData(username);
