@@ -233,8 +233,21 @@ namespace PSZO_VernyomasMero
                                         TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
                                         break;
                                     case 1:
-                                        TextDecoration.WriteLineCentered("Még nem elérhető!", false);
-                                        TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
+                                        int valuesortchoice = MenuControll.ArrowMenuWithTable(new string[] { "Szisztolés alapú", "Diasztolés alapú", "Pulzus alapú", "Vissza" }, "Rendezés", () => BpStore.PrintBpTable(LoginUserName));
+                                        switch(valuesortchoice)
+                                        {
+                                            case 0:
+                                                BpStore[] sortedSysBp = sortBpUni('s', LoginUserName);
+                                                break;
+                                            case 1:
+                                                BpStore[] sortedDiaBp = sortBpUni('d', LoginUserName);
+                                                break;
+                                            case 2:
+                                                BpStore[] sortedPulBp = sortBpUni('p', LoginUserName);
+                                                break;
+                                            case 3:
+                                                break;
+                                        }
                                         break;
                                     case 2:
                                         break;
