@@ -229,24 +229,27 @@ namespace PSZO_VernyomasMero
                                 switch(userdatachoice)
                                 {
                                     case 0:
-                                        TextDecoration.WriteLineCentered("Még nem elérhető!", false);
-                                        TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
-                                        break;
+                                        BpStore[] sortedDateBp = BpStore.sortBpUni('t', LoginUserName, true);
+                                        BpStore.SaveSortedBpData(LoginUserName, sortedDateBp);
+                                        continue;
                                     case 1:
                                         int valuesortchoice = MenuControll.ArrowMenuWithTable(new string[] { "Szisztolés alapú", "Diasztolés alapú", "Pulzus alapú", "Vissza" }, "Rendezés", () => BpStore.PrintBpTable(LoginUserName));
                                         switch(valuesortchoice)
                                         {
                                             case 0:
-                                                BpStore[] sortedSysBp = sortBpUni('s', LoginUserName);
-                                                break;
+                                                BpStore[] sortedSysBp = BpStore.sortBpUni('s', LoginUserName,true);
+                                                BpStore.SaveSortedBpData(LoginUserName, sortedSysBp);
+                                                continue;
                                             case 1:
-                                                BpStore[] sortedDiaBp = sortBpUni('d', LoginUserName);
-                                                break;
+                                                BpStore[] sortedDiaBp = BpStore.sortBpUni('d', LoginUserName,true);
+                                                BpStore.SaveSortedBpData(LoginUserName, sortedDiaBp);
+                                                continue;
                                             case 2:
-                                                BpStore[] sortedPulBp = sortBpUni('p', LoginUserName);
-                                                break;
+                                                BpStore[] sortedPulBp = BpStore.sortBpUni('p', LoginUserName, true);
+                                                BpStore.SaveSortedBpData(LoginUserName, sortedPulBp);
+                                                continue;
                                             case 3:
-                                                break;
+                                                continue;
                                         }
                                         break;
                                     case 2:
@@ -290,155 +293,6 @@ namespace PSZO_VernyomasMero
                 }
             }
         }
-
-        public static BpStore splitLine(string line)
-        {
-            string[] lineSplit = line.Split(';');
-
-            return new BpStore(lineSplit[0], DateTime.Parse(lineSplit[1]), int.Parse(lineSplit[2]), int.Parse(lineSplit[3]), int.Parse(lineSplit[4]));
-        }
-
-
-        public static BpStore minFind(string username, List<BpStore> BpArray, char mode)
-        {
-            BpStore min = BpArray[0];
-
-            for (int i = 0; i < BpArray.Count; i++)
-            {
-                if (mode == 't')
-                {
-                    if (BpArray[i].date < min.date)
-                    {
-                        min = BpArray[i];
-                    }
-                }
-                else if (mode == 's')
-                {
-                    if (BpArray[i].sys < min.sys)
-                    {
-                        min = BpArray[i];
-                    }
-                }
-                else if (mode == 'd')
-                {
-                    if (BpArray[i].dia < min.dia)
-                    {
-                        min = BpArray[i];
-                    }
-                }
-                else if (mode == 'p')
-                {
-                    if (BpArray[i].pulse < min.pulse)
-                    {
-                        min = BpArray[i];
-                    }
-                }
-            }
-
-            return min;
-        }
-
-        public static BpStore maxFind(string username, List<BpStore> BpArray, char mode)
-        {
-            BpStore max = BpArray[0];
-
-            for (int i = 0; i < BpArray.Count; i++)
-            {
-                if (mode == 't')
-                {
-                    if (BpArray[i].date > max.date)
-                    {
-                        max = BpArray[i];
-                    }
-                }
-                else if (mode == 's')
-                {
-                    if (BpArray[i].sys > max.sys)
-                    {
-                        max = BpArray[i];
-                    }
-                }
-                else if (mode == 'd')
-                {
-                    if (BpArray[i].dia > max.dia)
-                    {
-                        max = BpArray[i];
-                    }
-                }
-                else if (mode == 'p')
-                {
-                    if (BpArray[i].pulse > max.pulse)
-                    {
-                        max = BpArray[i];
-                    }
-                }
-            }
-
-            // Console.WriteLine(max.date);
-
-            return max;
-        }
-
-        /// <summary>
-        /// SORBA RENDEZI A MEGADOTT FELHASZNÁLÓ ADATAIT A KÉRT ADAT SZERINT (DÁTUM // SZISZTOLIKUS, DIASZTOLIKUS, VAGY PULZUS ÉRTÉKE SZERINT) [A mode paraméterben választhatja ki a kért adatot (később részletezve lesz)]
-        /// </summary>
-        /// <param name="mode">A PARAMÉTER AMI SZERINT A SORBA RENDEZÉS TÖRTÉNIK t: dátum szerint; d: diasztolikus érték szerint; s: szisztolikus érték szerint; p: pulzus szerint</param>
-        /// <param name="username">FELHASZNÁLÓ FELHASZNÁLÓNEVE AKINÉL A SORBARENDEZÉSNEK TÖRTÉNNIE KELL</param>
-        /// <param name="asc">NÖVEKVŐ SORREND ENGEDÉLYEZÉSE: false(alapértelmezett) -> csökkenő; true -> növekvő</param>
-        /// <returns></returns>
-        public static BpStore[] sortBpUni(char mode, string username, bool asc = false)
-        {
-            string[] userBpDataRaw = BpStore.ReadBpData(username);
-
-            List<BpStore> userBpDatas = new List<BpStore> { };
-            BpStore[] sortedBpDatas = new BpStore[userBpDataRaw.Length];
-
-            BpStore bpData = new BpStore();
-
-            for (int i = 0; i < userBpDataRaw.Length; i++)
-            {
-                bpData = new BpStore(userBpDataRaw[i]);
-
-                userBpDatas.Add(bpData);
-            }
-
-            if (asc)
-            {
-                for (int i = 0; i < userBpDataRaw.Length; i++)
-                {
-                    sortedBpDatas[i] = maxFind(username, userBpDatas, mode);
-
-                    // Console.WriteLine(sortedBpDatas[i].date);
-
-                    RemoveObjectFromList(userBpDatas, sortedBpDatas, i);
-                }
-            }
-            else
-            {
-                for (int i = 0; i < userBpDataRaw.Length; i++)
-                {
-                    sortedBpDatas[i] = minFind(username, userBpDatas, mode);
-
-                    // Console.WriteLine(sortedBpDatas[i].date);
-
-                    RemoveObjectFromList(userBpDatas, sortedBpDatas, i);
-                }
-            }
-
-            return sortedBpDatas;
-        }
-
-        private static void RemoveObjectFromList(List<BpStore> userBpDatas, BpStore[] sortedBpDatas, int i)
-        {
-            for (int j = 0; j < userBpDatas.Count; j++)
-            {
-                if (sortedBpDatas[i] == userBpDatas[j])
-                {
-                    userBpDatas.RemoveAt(j);
-                }
-            }
-        }
-
         /// <summary>
         /// A VÉRNYOMÁS ADATAIT TÁROLJA(MÉRÉS IDEJE,EREDMÉNYE, qANY)
         /// </summary>
@@ -449,6 +303,184 @@ namespace PSZO_VernyomasMero
             public int sys;
             public int dia;
             public int pulse;
+
+            /// <summary>
+            /// Szortírozott vérnyomás adatok fájlba mentése
+            /// </summary>
+            /// <param name="username">A menteni kivánt felhasználó neve</param>
+            /// <param name="sortedData">A szortírozott paraméterek</param>
+            public static void SaveSortedBpData(string username, BpStore[] sortedData)
+            {
+                // FELÜLÍRJUK A RÉGI ADATOKAT AZ ÚJ, SORBA RENDEZETT ADATOKKAL
+                string basePath = AppDomain.CurrentDomain.BaseDirectory;
+                string projectPath = Path.GetFullPath(Path.Combine(basePath, @"..\..\.."));
+                string filePath = Path.Combine(projectPath, "BpData.txt");
+                // BEOLVASÁS
+                List<string> allLines = File.ReadAllLines(filePath).ToList();
+                List<string> filtered = new List<string>();
+                foreach (string line in allLines)
+                {
+                    string[] parts = line.Split(';');
+                    string lineUser = parts[0];
+                    if (lineUser != username)
+                    {
+                        filtered.Add(line);
+                    }
+                }
+                allLines = filtered;
+                foreach (var bp in sortedData)
+                {
+                    allLines.Add($"{bp.user};{bp.date.ToShortDateString()};{bp.sys};{bp.dia};{bp.pulse}");
+                }
+                File.WriteAllLines(filePath, allLines);
+            }
+            public static BpStore splitLine(string line)
+            {
+                string[] lineSplit = line.Split(';');
+
+                return new BpStore(lineSplit[0], DateTime.Parse(lineSplit[1]), int.Parse(lineSplit[2]), int.Parse(lineSplit[3]), int.Parse(lineSplit[4]));
+            }
+
+
+            public static BpStore minFind(string username, List<BpStore> BpArray, char mode)
+            {
+                BpStore min = BpArray[0];
+
+                for (int i = 0; i < BpArray.Count; i++)
+                {
+                    if (mode == 't')
+                    {
+                        if (BpArray[i].date < min.date)
+                        {
+                            min = BpArray[i];
+                        }
+                    }
+                    else if (mode == 's')
+                    {
+                        if (BpArray[i].sys < min.sys)
+                        {
+                            min = BpArray[i];
+                        }
+                    }
+                    else if (mode == 'd')
+                    {
+                        if (BpArray[i].dia < min.dia)
+                        {
+                            min = BpArray[i];
+                        }
+                    }
+                    else if (mode == 'p')
+                    {
+                        if (BpArray[i].pulse < min.pulse)
+                        {
+                            min = BpArray[i];
+                        }
+                    }
+                }
+
+                return min;
+            }
+
+            public static BpStore maxFind(string username, List<BpStore> BpArray, char mode)
+            {
+                BpStore max = BpArray[0];
+
+                for (int i = 0; i < BpArray.Count; i++)
+                {
+                    if (mode == 't')
+                    {
+                        if (BpArray[i].date > max.date)
+                        {
+                            max = BpArray[i];
+                        }
+                    }
+                    else if (mode == 's')
+                    {
+                        if (BpArray[i].sys > max.sys)
+                        {
+                            max = BpArray[i];
+                        }
+                    }
+                    else if (mode == 'd')
+                    {
+                        if (BpArray[i].dia > max.dia)
+                        {
+                            max = BpArray[i];
+                        }
+                    }
+                    else if (mode == 'p')
+                    {
+                        if (BpArray[i].pulse > max.pulse)
+                        {
+                            max = BpArray[i];
+                        }
+                    }
+                }
+
+                // Console.WriteLine(max.date);
+
+                return max;
+            }
+
+            /// <summary>
+            /// SORBA RENDEZI A MEGADOTT FELHASZNÁLÓ ADATAIT A KÉRT ADAT SZERINT (DÁTUM // SZISZTOLIKUS, DIASZTOLIKUS, VAGY PULZUS ÉRTÉKE SZERINT) [A mode paraméterben választhatja ki a kért adatot (később részletezve lesz)]
+            /// </summary>
+            /// <param name="mode">A PARAMÉTER AMI SZERINT A SORBA RENDEZÉS TÖRTÉNIK t: dátum szerint; d: diasztolikus érték szerint; s: szisztolikus érték szerint; p: pulzus szerint</param>
+            /// <param name="username">FELHASZNÁLÓ FELHASZNÁLÓNEVE AKINÉL A SORBARENDEZÉSNEK TÖRTÉNNIE KELL</param>
+            /// <param name="asc">NÖVEKVŐ SORREND ENGEDÉLYEZÉSE: false(alapértelmezett) -> csökkenő; true -> növekvő</param>
+            /// <returns></returns>
+            public static BpStore[] sortBpUni(char mode, string username, bool asc = false)
+            {
+                string[] userBpDataRaw = BpStore.ReadBpData(username);
+
+                List<BpStore> userBpDatas = new List<BpStore> { };
+                BpStore[] sortedBpDatas = new BpStore[userBpDataRaw.Length];
+
+                BpStore bpData = new BpStore();
+
+                for (int i = 0; i < userBpDataRaw.Length; i++)
+                {
+                    bpData = new BpStore(userBpDataRaw[i]);
+
+                    userBpDatas.Add(bpData);
+                }
+
+                if (asc)
+                {
+                    for (int i = 0; i < userBpDataRaw.Length; i++)
+                    {
+                        sortedBpDatas[i] = maxFind(username, userBpDatas, mode);
+
+                        // Console.WriteLine(sortedBpDatas[i].date);
+
+                        RemoveObjectFromList(userBpDatas, sortedBpDatas, i);
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < userBpDataRaw.Length; i++)
+                    {
+                        sortedBpDatas[i] = minFind(username, userBpDatas, mode);
+
+                        // Console.WriteLine(sortedBpDatas[i].date);
+
+                        RemoveObjectFromList(userBpDatas, sortedBpDatas, i);
+                    }
+                }
+
+                return sortedBpDatas;
+            }
+
+            private static void RemoveObjectFromList(List<BpStore> userBpDatas, BpStore[] sortedBpDatas, int i)
+            {
+                for (int j = 0; j < userBpDatas.Count; j++)
+                {
+                    if (sortedBpDatas[i] == userBpDatas[j])
+                    {
+                        userBpDatas.RemoveAt(j);
+                    }
+                }
+            }
 
             /// <summary>
             /// Vérnyomás adatainak fájlba mentése
