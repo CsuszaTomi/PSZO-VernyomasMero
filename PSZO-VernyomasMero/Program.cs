@@ -235,11 +235,16 @@ namespace PSZO_VernyomasMero
                                 BpStore.PrintMaxMinBpValues(LoginUserName);
                                 BpStore.PrintMaxMinBpValuesGlobal();
                                 List<string> diffusers = BpStore.GetDifferentBPUser(30);
-                                TextDecoration.WriteLineCentered("Felhasználók, akiknél nagyobb mint 30% eltérés van:");
+                                TextDecoration.WriteLineCentered("╔════════════════════════════════════════════════════════╗");
+                                TextDecoration.WriteLineCentered("║   Felhasználók, akiknél nagyobb mint 30% eltérés van   ║");
+                                //TextDecoration.WriteLineCentered("╠════════════════════════════════════════════════════════╣");
                                 foreach (var user in diffusers)
                                 {
-                                    TextDecoration.WriteLineCentered(user);
+                                    Console.Write("╬═══════");
+                                    Console.Write($"║ {user}" + "║");
+                                    Console.WriteLine("╩═══════");
                                 }
+                                //TextDecoration.WriteLineCentered("╚════════════════════════════════════════════════════════╝");
                                 TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
                                 Console.ReadLine();
                                 break;
