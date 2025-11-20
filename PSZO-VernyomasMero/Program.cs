@@ -227,7 +227,6 @@ namespace PSZO_VernyomasMero
                                 Console.Clear();
                                 Console.ForegroundColor = ConsoleColor.Red;
                                 TextDecoration.WriteLineCentered("=== STATISZTIKÁK ===", false);
-                                TextDecoration.WriteLineCentered(BpStore.AverageBpData(LoginUserName));
                                 BpStore.PrintMaxMinBpValues(LoginUserName);
                                 BpStore.PrintMaxMinBpValuesGlobal();
                                 List<string> diffusers = BpStore.GetDifferentBPUser(30);
@@ -589,6 +588,33 @@ namespace PSZO_VernyomasMero
                 return new int[] { AverageMaxSys/users.Length, AverageMinSys/users.Length, AverageMaxDia/ users.Length, AverageMinDia/ users.Length, AverageMaxPul/ users.Length, AverageMinPul/ users.Length };
             }
             /// <summary>
+            /// Visszaadja a globális átlagos vérnyomás értékeket
+            /// </summary>
+            /// <returns></returns>
+            public static int[] GetAverageBpValueGlobal()
+            {
+                string[] users = User.GetUserNames();
+                int AverageSys = 0;
+                int AverageDia = 0;
+                int AveragePul = 0;
+
+                foreach (var user in users)
+                {
+                    string[] userbpdata = ReadBpData(user);
+                    foreach (var line in userbpdata)
+                    {
+                        string[] split = line.Split(';');
+                        int sys = int.Parse(split[2]);
+                        int dia = int.Parse(split[3]);
+                        int pul = int.Parse(split[4]);
+                        AverageSys += sys;
+                        AverageDia += dia;
+                        AveragePul += pul;
+                    }
+                }
+                return new int[] { AverageSys / users.Length, AverageDia / users.Length, AveragePul / users.Length};
+            }
+            /// <summary>
             /// Vérnyomás adatok kiírása táblázatos formában
             /// </summary>
             /// <param name="username"></param>
@@ -645,16 +671,20 @@ namespace PSZO_VernyomasMero
                 int minDia = minmax[3];
                 int maxPul = minmax[4];
                 int minPul = minmax[5];
+                int[] avg = GetAverageBpValueGlobal();
+                int avgSys = avg[0];
+                int avgDia = avg[1];
+                int avgPul = avg[2];
                 Console.WriteLine(" ");
                 TextDecoration.WriteLineCentered("Globális értékek");
                 Console.WriteLine(" ");
-                TextDecoration.WriteLineCentered("╔══════════════════╦════════╦════════╗");
-                TextDecoration.WriteLineCentered("║ Érték típusa     ║   MIN  ║   MAX  ║");
-                TextDecoration.WriteLineCentered("╠══════════════════╬════════╬════════╣");
-                TextDecoration.WriteLineCentered($"║ Szisztolés érték ║ {minSys.ToString().PadLeft(6)} ║ {maxSys.ToString().PadLeft(6)} ║");
-                TextDecoration.WriteLineCentered($"║ Diasztolés érték ║ {minDia.ToString().PadLeft(6)} ║ {maxDia.ToString().PadLeft(6)} ║");
-                TextDecoration.WriteLineCentered($"║ Pulzus érték     ║ {minPul.ToString().PadLeft(6)} ║ {maxPul.ToString().PadLeft(6)} ║");
-                TextDecoration.WriteLineCentered("╚══════════════════╩════════╩════════╝");
+                TextDecoration.WriteLineCentered("╔══════════════════╦════════╦════════╦════════╗");
+                TextDecoration.WriteLineCentered("║ Érték típusa     ║   MIN  ║   MAX  ║   AVG  ║");
+                TextDecoration.WriteLineCentered("╠══════════════════╬════════╬════════╬════════╣");
+                TextDecoration.WriteLineCentered($"║ Szisztolés érték ║ {minSys.ToString().PadLeft(6)} ║ {maxSys.ToString().PadLeft(6)} ║ {avgSys.ToString().PadLeft(6)} ║");
+                TextDecoration.WriteLineCentered($"║ Diasztolés érték ║ {minDia.ToString().PadLeft(6)} ║ {maxDia.ToString().PadLeft(6)} ║ {avgDia.ToString().PadLeft(6)} ║");
+                TextDecoration.WriteLineCentered($"║ Pulzus érték     ║ {minPul.ToString().PadLeft(6)} ║ {maxPul.ToString().PadLeft(6)} ║ {avgPul.ToString().PadLeft(6)} ║");
+                TextDecoration.WriteLineCentered("╚══════════════════╩════════╩════════╩════════╝");
                 Console.WriteLine(" ");
             }
 
