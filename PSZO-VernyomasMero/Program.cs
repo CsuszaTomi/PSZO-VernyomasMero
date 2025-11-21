@@ -237,16 +237,52 @@ namespace PSZO_VernyomasMero
                                         switch(valuesortchoice)
                                         {
                                             case 0:
-                                                BpStore[] sortedSysBp = BpStore.sortBpUni('s', LoginUserName,true);
-                                                BpStore.SaveSortedBpData(LoginUserName, sortedSysBp);
+                                                int syschoice = MenuControll.ArrowMenuWithTable(new string[] { "Növekvő", "Csökkenő", "Vissza" }, "Szisztolés alapú Rendezés", () => BpStore.PrintBpTable(LoginUserName));
+                                                switch (syschoice)
+                                                {
+                                                    case 0:
+                                                        BpStore[] sortedBpUp = BpStore.sortBpUni('s', LoginUserName, true);
+                                                        BpStore.SaveSortedBpData(LoginUserName, sortedBpUp);
+                                                        continue;
+                                                    case 1:
+                                                        BpStore[] sortedBpDown = BpStore.sortBpUni('s', LoginUserName, false);
+                                                        BpStore.SaveSortedBpData(LoginUserName, sortedBpDown);
+                                                        continue;
+                                                    case 2:
+                                                        continue;
+                                                }
                                                 continue;
                                             case 1:
-                                                BpStore[] sortedDiaBp = BpStore.sortBpUni('d', LoginUserName,true);
-                                                BpStore.SaveSortedBpData(LoginUserName, sortedDiaBp);
+                                                int diachoice = MenuControll.ArrowMenuWithTable(new string[] { "Növekvő", "Csökkenő", "Vissza" }, "Diasztolés alapú Rendezés", () => BpStore.PrintBpTable(LoginUserName));
+                                                switch (diachoice)
+                                                {
+                                                    case 0:
+                                                        BpStore[] sortedBpUp = BpStore.sortBpUni('d', LoginUserName, true);
+                                                        BpStore.SaveSortedBpData(LoginUserName, sortedBpUp);
+                                                        continue;
+                                                    case 1:
+                                                        BpStore[] sortedBpDown = BpStore.sortBpUni('d', LoginUserName, false);
+                                                        BpStore.SaveSortedBpData(LoginUserName, sortedBpDown);
+                                                        continue;
+                                                    case 2:
+                                                        continue;
+                                                }
                                                 continue;
                                             case 2:
-                                                BpStore[] sortedPulBp = BpStore.sortBpUni('p', LoginUserName, true);
-                                                BpStore.SaveSortedBpData(LoginUserName, sortedPulBp);
+                                                int pulchoice = MenuControll.ArrowMenuWithTable(new string[] { "Növekvő", "Csökkenő", "Vissza" }, "Pulzus alapú Rendezés", () => BpStore.PrintBpTable(LoginUserName));
+                                                switch (pulchoice)
+                                                {
+                                                    case 0:
+                                                        BpStore[] sortedBpUp = BpStore.sortBpUni('p', LoginUserName, true);
+                                                        BpStore.SaveSortedBpData(LoginUserName, sortedBpUp);
+                                                        continue;
+                                                    case 1:
+                                                        BpStore[] sortedBpDown = BpStore.sortBpUni('p', LoginUserName, false);
+                                                        BpStore.SaveSortedBpData(LoginUserName, sortedBpDown);
+                                                        continue;
+                                                    case 2:
+                                                        continue;
+                                                }
                                                 continue;
                                             case 3:
                                                 continue;
