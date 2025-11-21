@@ -570,7 +570,6 @@ namespace PSZO_VernyomasMero
             /// <param name="diast"></param>
             /// <param name="bpm"></param>
             /// <returns></returns>
-
             public static string InspectBP(DateTime birthDate, int sys, int diast, int bpm)
             {
                 // KISZÁMOLJUK AZ ÉLETKORÁT
@@ -800,61 +799,31 @@ namespace PSZO_VernyomasMero
             public static int[] GetMaxMinBpValuesGlobal()
             {
                 string[] users = User.GetUserNames();
-                int AverageMaxSys = 0;
-                int AverageMinSys = 0;
-                int AverageMaxDia = 0;
-                int AverageMinDia = 0;
-                int AverageMaxPul = 0;
-                int AverageMinPul = 0;
+                int maxSys = int.MinValue;
+                int minSys = int.MaxValue;
+                int maxDia = int.MinValue;
+                int minDia = int.MaxValue;
+                int maxPul = int.MinValue;
+                int minPul = int.MaxValue;
 
                 foreach (var user in users)
                 {
                     string[] userbpdata = ReadBpData(user);
-                    int maxSys = 0;
-                    int minSys = 0;
-                    int maxDia = 0;
-                    int minDia = 0;
-                    int maxPul = 0;
-                    int minPul = 0;
                     foreach (var line in userbpdata)
                     {
                         string[] split = line.Split(';');
                         int sys = int.Parse(split[2]);
                         int dia = int.Parse(split[3]);
                         int pul = int.Parse(split[4]);
-                        if (sys > maxSys)
-                        {
-                            maxSys = sys;
-                        }
-                        if (sys < minSys || minSys == 0)
-                        {
-                            minSys = sys;
-                        }
-                        if (dia > maxDia)
-                        {
-                            maxDia = dia;
-                        }
-                        if (dia < minDia || minDia == 0)
-                        {
-                            minDia = dia;
-                        }
-                        if (pul > maxPul)
-                        {
-                            maxPul = pul;
-                        }
-                        if (pul < minPul || minPul == 0)
-                        {
-                            minPul = pul;
-                        }
-                        AverageMaxDia += maxDia;
-                        AverageMinDia += minDia;
-                        AverageMaxSys += maxSys;
-                        AverageMinSys += minSys;
-                        AverageMaxPul += maxPul;
-                        AverageMinPul += minPul;
+                        maxSys = Math.Max(maxSys, sys);
+                        minSys = Math.Min(minSys, sys);
+                        maxDia = Math.Max(maxDia, dia);
+                        minDia = Math.Min(minDia, dia);
+                        maxPul = Math.Max(maxPul, pul);
+                        minPul = Math.Min(minPul, pul);
                     }
                 }
-                return new int[] { AverageMaxSys/users.Length, AverageMinSys/users.Length, AverageMaxDia/ users.Length, AverageMinDia/ users.Length, AverageMaxPul/ users.Length, AverageMinPul/ users.Length };
+                return new int[] {maxSys,minSys,maxDia,minDia,maxPul,minPul };
             }
             /// <summary>
             /// Visszaadja a globális átlagos vérnyomás értékeket
