@@ -13,6 +13,7 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using static PSZO_VernyomasMero.Program;
 
 namespace PSZO_VernyomasMero
@@ -227,17 +228,16 @@ namespace PSZO_VernyomasMero
                                 TextDecoration.WriteLineCentered("=== STATISZTIKÁK ===", false);
                                 BpStore.PrintMaxMinBpValues(LoginUserName);
                                 BpStore.PrintMaxMinBpValuesGlobal();
-                                List<string> diffusers = BpStore.GetDifferentBPUser(30);
-                                TextDecoration.WriteLineCentered("╔════════════════════════════════════════════════════════╗");
-                                TextDecoration.WriteLineCentered("║   Felhasználók, akiknél nagyobb mint 30% eltérés van   ║");
-                                //TextDecoration.WriteLineCentered("╠════════════════════════════════════════════════════════╣");
-                                foreach (var user in diffusers)
+                                TextDecoration.WriteLineCentered("Adja meg hogy milyen százaléknál nagyobb eltéréssel rendelkező felhasználókat szeretne látni (0-100): ", false);
+                                string percentinput = Console.ReadLine();
+                                if (percentinput == "")
                                 {
-                                    Console.Write("╬═══════");
-                                    Console.Write($"║ {user}" + "║");
-                                    Console.WriteLine("╩═══════");
+                                    break;
                                 }
-                                //TextDecoration.WriteLineCentered("╚════════════════════════════════════════════════════════╝");
+                                int statisticchoice = InputChecks.IsValidInt(percentinput, true, 0, 100);
+                                List<string> diffusers = BpStore.GetDifferentBPUser(statisticchoice);
+                                TextDecoration.WriteLineCentered($"Felhasználók, akiknél a mérésekben a vérnyomás {statisticchoice}%-nál több esetben tér el a normálistól", false);
+                                BpStore.PrintUsersAboveCertainPercentOfDifference(diffusers);
                                 TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
                                 Console.ReadLine();
                                 break;
@@ -706,51 +706,44 @@ namespace PSZO_VernyomasMero
             /// </summary>
             /// <param name="maxDiff">A megengedett maximum eltérés százalékban</param>
             /// <returns>Felhasználónevek listája</returns> 
-            public static List<string> GetDifferentBPUser(double maxDiff)
+            public static List<string> GetDifferentBPUser(double limitPercent)
             {
-                int diffNum = 0;
-
-                double diffPercent = 0;
-
-                string[] users = User.GetUserNames();
-                string[] cUserData = { };
-                string[] lineSplit = { };
-                string[] inspected = { };
-
-                List<string> diffUsers = new List<string> { };
-
-                foreach (string user in users)
+                List<string> diffUsers = new List<string>();
+                string[] allUsers = User.GetUserNames();
+                foreach (string user in allUsers)
                 {
-                    cUserData = BpStore.ReadBpData(user);
-                    diffNum = 0;
-
-                    if (cUserData.Length != 0)
+                    string[] bpLines = ReadBpData(user);
+                    string currentUser = user;
+                    if (bpLines.Length == 0)
                     {
-                        foreach (string line in cUserData)
+                        continue;
+                    }
+                    int notNormalCount = 0;
+                    foreach (string line in bpLines)
+                    {
+                        var parts = line.Split(';');
+                        string u = parts[0];
+                        DateTime date = DateTime.Parse(parts[1]);
+                        int sys = int.Parse(parts[2]);
+                        int dia = int.Parse(parts[3]);
+                        int pul = int.Parse(parts[4]);
+
+                        DateTime birth = User.Get(currentUser).BirthDate;
+
+                        string status = InspectBP(birth, sys, dia, pul);
+
+                        if (!status.Contains("normális"))
                         {
-                            lineSplit = line.Split(';');
-
-                            inspected = BpStore.InspectBP(DateTime.Parse(lineSplit[1]), int.Parse(lineSplit[2]), int.Parse(lineSplit[3]), int.Parse(lineSplit[4])).Split(';');
-
-
-                            if (lineSplit[0] == user)
-                            {
-                                if (inspected[0] != "normális" || inspected[1] != "normális" || inspected[2] != "normális")
-                                {
-                                    diffNum++;
-                                }
-                            }
-                        }
-
-                        diffPercent = (double)diffNum / cUserData.Length * 100;
-
-                        if (diffPercent < maxDiff || diffPercent > maxDiff)
-                        {
-                            diffUsers.Add(user);
+                            notNormalCount++;
                         }
                     }
-                }
+                    double percent = (double)notNormalCount / bpLines.Length * 100.0;
 
+                    if (percent >= limitPercent)
+                    {
+                        diffUsers.Add(user);
+                    }
+                }
                 return diffUsers;
             }
 
@@ -889,7 +882,10 @@ namespace PSZO_VernyomasMero
                 }
                 TextDecoration.WriteLineCentered("╚══════════════════╩═══════╩═══════╩═══════╝");
             }
-
+            /// <summary>
+            /// Kiírja a megadott felhasználó személyes maximum és minimum vérnyomás értékeit
+            /// </summary>
+            /// <param name="username"></param>
             public static void PrintMaxMinBpValues(string username)
             {
                 int[] minmax = GetMaxMinBpValues(username);
@@ -914,7 +910,9 @@ namespace PSZO_VernyomasMero
                 TextDecoration.WriteLineCentered($"║ Pulzus érték     ║ {minPul.ToString().PadLeft(6)} ║ {maxPul.ToString().PadLeft(6)} ║{avgpul.ToString().PadLeft(6)} ║");
                 TextDecoration.WriteLineCentered("╚══════════════════╩════════╩════════╩═══════╝");
             }
-
+            /// <summary>
+            /// Kiírja a globális maximum és minimum vérnyomás értékeket
+            /// </summary>
             public static void PrintMaxMinBpValuesGlobal()
             {
                 int[] minmax = GetMaxMinBpValuesGlobal();
@@ -940,10 +938,33 @@ namespace PSZO_VernyomasMero
                 TextDecoration.WriteLineCentered("╚══════════════════╩════════╩════════╩════════╝");
                 Console.WriteLine(" ");
             }
+            /// <summary>
+            /// Kiírja a megadott felhasználó nevét, akiknek a mérések bizonyos százalékban eltérnek a normálistól
+            /// </summary>
+            /// <param name="username"></param>
+            public static void PrintUsersAboveCertainPercentOfDifference(List<string> diffusers)
+            {
+                if (diffusers.Count == 0)
+                {
+                    TextDecoration.WriteLineCentered("Nincs adat");
+                    return;
+                }
+                TextDecoration.WriteLineCentered("╔══════════════════╗");
+                TextDecoration.WriteLineCentered("║ Felhasználó név  ║");
+                TextDecoration.WriteLineCentered("╠══════════════════╣");
+                foreach (var line in diffusers)
+                {
+                    string[] split = line.Split(';');
+                    string name = split[0];
+                    string centered = TextDecoration.CenterText(name, 17);
+                    TextDecoration.WriteLineCentered($"║{centered} ║");
+                }
+                TextDecoration.WriteLineCentered("╚══════════════════╝");
+            }
 
 
             /// <summary>
-            /// 
+            /// Felhasználói vérnyomásadatok beolvasása
             /// </summary>
             /// <param name="userName"></param>
             /// <returns></returns>
@@ -1025,7 +1046,19 @@ namespace PSZO_VernyomasMero
                     Users.Add(NewUser);
                 }
             }
-            
+
+            public static User Get(string username)
+            {
+                foreach (var user in Users)
+                {
+                    if (user.UserName == username)
+                    {
+                        return user;
+                    }
+                }
+                return null;
+            }
+
             /// <summary>
             /// Felhasználók felsorolása
             /// </summary>
@@ -1117,58 +1150,110 @@ namespace PSZO_VernyomasMero
                 return date;
             }
 
+            /// <summary>
+            /// Egy szöveges bemenet érvényesítése és egésszé alakítása, opcionálisan megadott tartományon belüli ellenőrzéssel.
+            /// </summary>
+            /// <remarks>
+            /// Ha a <paramref name="betweenvalues"/> értéke <see langword="true"/>, akkor a függvény
+            /// addig kéri újra a felhasználótól a bemenetet, amíg egy érvényes, a megadott tartományba eső egész számot nem ad.
+            /// Ha a <paramref name="betweenvalues"/> értéke <see langword="false"/>, akkor addig kéri újra a bemenetet,
+            /// amíg egy érvényes egész számot nem ad.
+            /// </remarks>
+            /// <param name="intInput">A szöveges bemenet, amelynek érvényességét ellenőrizzük és amelyet egésszé alakítunk.</param>
+            /// <param name="betweenvalues">Jelzi, hogy a bemenetet egy megadott értéktartományon belül is ellenőrizni kell-e.</param>
+            /// <param name="minValue">A minimális érték, ha a <paramref name="betweenvalues"/> értéke <see langword="true"/>.</param>
+            /// <param name="maxValue">A maximális érték, ha a <paramref name="betweenvalues"/> értéke <see langword="true"/>.</param>
+            /// <returns>Az érvényesített egész szám. Ha a <paramref name="betweenvalues"/> értéke <see langword="true"/>, akkor az érték a <paramref name="minValue"/> és <paramref name="maxValue"/> közé fog esni.</returns>
+            public static int IsValidInt(string intInput, bool betweenvalues = false, int minValue = 0, int maxValue = 0)
+            {
+                int number;
+                if (betweenvalues)
+                {
+                    while (!int.TryParse(intInput, out number) || number < minValue || number > maxValue)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        TextDecoration.WriteLineCentered($"Nem jól adta meg az értéket! Adjon meg egy számot {minValue} és {maxValue} között: ", false);
+                        Console.ForegroundColor = ConsoleColor.White;
+                        intInput = Console.ReadLine();
+                    }
+                    return number;
+                }
+                else//ha nem 2 érték között kell lennie hanem csak simán számnak
+                {
+                    while (!int.TryParse(intInput, out number))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        TextDecoration.WriteLineCentered("Nem jól adta meg az értéket! Adjon meg egy számot: ", false);
+                        Console.ForegroundColor = ConsoleColor.White;
+                        intInput = Console.ReadLine();
+                    }
+                    return number;
+                }
+            }
+
         }
         /// <summary>
         /// Olyan függvényeket tartalmaz amelyek a konzol szövegek dekorálására szolgálnak
         /// </summary>
-        internal class TextDecoration
-        {
-            /// <summary>
-            /// A függvény a Console.WriteLine középre íratását valósítja meg
-            /// </summary>
-            /// <param name="text">A megadott szöveget írja ki középre</param>
-            /// <param name="changeColor">Igaz érték esetén megváltoztatja a konzol betűszínét a beállításoknak megfelelően</param>
-            public static void WriteLineCentered(string text, bool changeColor = true)
-            // Console.WriteLine középre íratása
+            internal class TextDecoration
             {
-                int width = Console.WindowWidth;
-                int leftPadding = (width - text.Length) / 2;
-                if (leftPadding < 0)
+                /// <summary>
+                /// A függvény a Console.WriteLine középre íratását valósítja meg
+                /// </summary>
+                /// <param name="text">A megadott szöveget írja ki középre</param>
+                /// <param name="changeColor">Igaz érték esetén megváltoztatja a konzol betűszínét a beállításoknak megfelelően</param>
+                public static void WriteLineCentered(string text, bool changeColor = true)
+                // Console.WriteLine középre íratása
                 {
-                    leftPadding = 0;
+                    int width = Console.WindowWidth;
+                    int leftPadding = (width - text.Length) / 2;
+                    if (leftPadding < 0)
+                    {
+                        leftPadding = 0;
+                    }
+                    if (changeColor)
+                    {
+                        Settings.ChangeConsoleColors();
+                    }
+                    Console.WriteLine(new string(' ', leftPadding) + text);
                 }
-                if (changeColor)
+                public static void WriteCentered(string text, bool changeColor = true)
+                // Console.Write középre íratása
                 {
-                    Settings.ChangeConsoleColors();
+                    int width = Console.WindowWidth;
+                    int leftPadding = (width - text.Length) / 2;
+                    if (leftPadding < 0)
+                    {
+                        leftPadding = 0;
+                    }
+                    if (changeColor)
+                    {
+                        Settings.ChangeConsoleColors();
+                    }
+                    Console.Write(new string(' ', leftPadding) + text);
                 }
-                Console.WriteLine(new string(' ', leftPadding) + text);
-            }
-            public static void WriteCentered(string text, bool changeColor = true)
-            // Console.Write középre íratása
-            {
-                int width = Console.WindowWidth;
-                int leftPadding = (width - text.Length) / 2;
-                if (leftPadding < 0)
+                public static void LoadingAnimation(string message = "Mentés folyamatban", int durationMs = 1500)
                 {
-                    leftPadding = 0;
+                    WriteCentered($"{message}");
+                    int steps = 5;
+                    for (int i = 0; i < steps; i++)
+                    {
+                        Console.Write(".");
+                        Thread.Sleep(durationMs / steps);
+                    }
+                    Console.Write("Kész");
                 }
-                if (changeColor)
+
+                public static string CenterText(string text, int width)
                 {
-                    Settings.ChangeConsoleColors();
+                    if (text.Length > width)
+                        text = text.Substring(0, width);
+
+                    int left = (width - text.Length) / 2;
+                    int right = width - text.Length - left;
+
+                    return new string(' ', left) + text + new string(' ', right);
                 }
-                Console.Write(new string(' ', leftPadding) + text);
-            }
-            public static void LoadingAnimation(string message = "Mentés folyamatban", int durationMs = 1500)
-            {
-                WriteCentered($"{message}");
-                int steps = 5;
-                for (int i = 0; i < steps; i++)
-                {
-                    Console.Write(".");
-                    Thread.Sleep(durationMs / steps);
-                }
-                Console.Write("Kész");
-            }
 
         }
         /// <summary>
