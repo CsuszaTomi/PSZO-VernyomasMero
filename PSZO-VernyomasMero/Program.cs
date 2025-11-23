@@ -274,7 +274,7 @@ namespace PSZO_VernyomasMero
                 switch (userdatachoice)
                 {
                     case 0:
-                        BpStore[] sortedDateBp = BpStore.sortBpUni('t', LoginUserName, true);
+                        BpStore[] sortedDateBp = BpStore.SortBpUni('t', LoginUserName, true);
                         BpStore.SaveSortedBpData(LoginUserName, sortedDateBp);
                         continue;
                     case 1:
@@ -286,11 +286,11 @@ namespace PSZO_VernyomasMero
                                 switch (syschoice)
                                 {
                                     case 0:
-                                        BpStore[] sortedBpUp = BpStore.sortBpUni('s', LoginUserName, true);
+                                        BpStore[] sortedBpUp = BpStore.SortBpUni('s', LoginUserName, true);
                                         BpStore.SaveSortedBpData(LoginUserName, sortedBpUp);
                                         continue;
                                     case 1:
-                                        BpStore[] sortedBpDown = BpStore.sortBpUni('s', LoginUserName, false);
+                                        BpStore[] sortedBpDown = BpStore.SortBpUni('s', LoginUserName, false);
                                         BpStore.SaveSortedBpData(LoginUserName, sortedBpDown);
                                         continue;
                                     case 2:
@@ -302,11 +302,11 @@ namespace PSZO_VernyomasMero
                                 switch (diachoice)
                                 {
                                     case 0:
-                                        BpStore[] sortedBpUp = BpStore.sortBpUni('d', LoginUserName, true);
+                                        BpStore[] sortedBpUp = BpStore.SortBpUni('d', LoginUserName, true);
                                         BpStore.SaveSortedBpData(LoginUserName, sortedBpUp);
                                         continue;
                                     case 1:
-                                        BpStore[] sortedBpDown = BpStore.sortBpUni('d', LoginUserName, false);
+                                        BpStore[] sortedBpDown = BpStore.SortBpUni('d', LoginUserName, false);
                                         BpStore.SaveSortedBpData(LoginUserName, sortedBpDown);
                                         continue;
                                     case 2:
@@ -318,11 +318,11 @@ namespace PSZO_VernyomasMero
                                 switch (pulchoice)
                                 {
                                     case 0:
-                                        BpStore[] sortedBpUp = BpStore.sortBpUni('p', LoginUserName, true);
+                                        BpStore[] sortedBpUp = BpStore.SortBpUni('p', LoginUserName, true);
                                         BpStore.SaveSortedBpData(LoginUserName, sortedBpUp);
                                         continue;
                                     case 1:
-                                        BpStore[] sortedBpDown = BpStore.sortBpUni('p', LoginUserName, false);
+                                        BpStore[] sortedBpDown = BpStore.SortBpUni('p', LoginUserName, false);
                                         BpStore.SaveSortedBpData(LoginUserName, sortedBpDown);
                                         continue;
                                     case 2:
