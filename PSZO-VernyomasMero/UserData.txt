@@ -1,1 +1,8 @@
-PDD1;Papp Dániel Dominik;123;2008.11.18;Férfi  
+PDD1;Papp Dániel Dominik;123;2008. 11. 18.;Férfi  
+SZB1;Szilágyi Bálint;123;2008. 06. 07.;Férfi
+NImre;Németh Imre;traktor;2007. 12. 14.;Traktor
+Z;OZ;a;2000. 01. 01.;Férfi
+Dunka;Dunka Dunka;123;2008. 11. 17.;Férfi
+Lacibá;Sike László;1234;1972. 02. 28.;Férfi
+lacos;jelszo;jelszo;2008. 09. 26.;Férfi
+Laci;jelszo;jelszo;2008. 09. 26.;Férfi
