@@ -286,7 +286,7 @@ namespace PSZO_VernyomasMero
         }
 
 
-        public static BpStore minFind(string username, List<BpStore> BpArray, char mode)
+        public static BpStore MinFind(string username, List<BpStore> BpArray, char mode)
         {
             BpStore min = BpArray[0];
 
@@ -325,7 +325,7 @@ namespace PSZO_VernyomasMero
             return min;
         }
 
-        public static BpStore maxFind(string username, List<BpStore> BpArray, char mode)
+        public static BpStore MaxFind(string username, List<BpStore> BpArray, char mode)
         {
             BpStore max = BpArray[0];
 
@@ -373,7 +373,7 @@ namespace PSZO_VernyomasMero
         /// <param name="username">FELHASZNÁLÓ FELHASZNÁLÓNEVE AKINÉL A SORBARENDEZÉSNEK TÖRTÉNNIE KELL</param>
         /// <param name="asc">NÖVEKVŐ SORREND ENGEDÉLYEZÉSE: false(alapértelmezett) -> csökkenő; true -> növekvő</param>
         /// <returns></returns>
-        public static BpStore[] sortBpUni(char mode, string username, bool asc = false)
+        public static BpStore[] SortBpUni(char mode, string username, bool asc = false)
         {
             string[] userBpDataRaw = BpStore.ReadBpData(username);
 
@@ -393,7 +393,7 @@ namespace PSZO_VernyomasMero
             {
                 for (int i = 0; i < userBpDataRaw.Length; i++)
                 {
-                    sortedBpDatas[i] = maxFind(username, userBpDatas, mode);
+                    sortedBpDatas[i] = MaxFind(username, userBpDatas, mode);
 
                     // Console.WriteLine(sortedBpDatas[i].date);
 
@@ -404,7 +404,7 @@ namespace PSZO_VernyomasMero
             {
                 for (int i = 0; i < userBpDataRaw.Length; i++)
                 {
-                    sortedBpDatas[i] = minFind(username, userBpDatas, mode);
+                    sortedBpDatas[i] = MinFind(username, userBpDatas, mode);
 
                     // Console.WriteLine(sortedBpDatas[i].date);
 
