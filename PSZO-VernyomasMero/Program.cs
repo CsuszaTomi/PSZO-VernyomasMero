@@ -228,7 +228,7 @@ namespace PSZO_VernyomasMero
                                 TextDecoration.WriteLineCentered("=== STATISZTIKÁK ===", false);
                                 BpStore.PrintMaxMinBpValues(LoginUserName);
                                 BpStore.PrintMaxMinBpValuesGlobal();
-                                TextDecoration.WriteLineCentered("Adja meg hogy milyen százaléknál nagyobb eltéréssel rendelkező felhasználókat szeretne látni (0-100): ", false);
+                                TextDecoration.WriteCentered("Adja meg hogy milyen százaléknál nagyobb eltéréssel rendelkező felhasználókat szeretne látni (0-100): ", false);
                                 string percentinput = Console.ReadLine();
                                 if (percentinput == "")
                                 {
