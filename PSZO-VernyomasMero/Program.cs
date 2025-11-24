@@ -1268,7 +1268,7 @@ namespace PSZO_VernyomasMero
             /// <returns></returns>
             public static void SettingsMenu()
             {
-                int settingchoose = MenuControll.ArrowMenu(new string[] { "Téma kiválasztása","Program beállítások", "Fiók beállítások", "Vissza"}, "=== BEÁLLÍTÁSOK ===");
+                int settingchoose = MenuControll.ArrowMenu(new string[] { "Téma kiválasztása", "Vissza"}, "=== BEÁLLÍTÁSOK ===");
                 switch (settingchoose)
                 {
                     case 0:
@@ -1293,22 +1293,6 @@ namespace PSZO_VernyomasMero
                         }
                         break;
                     case 1:
-                        {
-                            Console.Clear();
-                            TextDecoration.WriteLineCentered("Nincsenek elérhető program beállítások!", false);
-                            TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
-                            Console.ReadLine();
-                            break;
-                        }
-                    case 2:
-                        {
-                            Console.Clear();
-                            TextDecoration.WriteLineCentered("Nincsenek elérhető fiók beállítások!", false);
-                            TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
-                            Console.ReadLine();
-                            break;
-                        }
-                    case 3:
                         break;
                 }
             }
