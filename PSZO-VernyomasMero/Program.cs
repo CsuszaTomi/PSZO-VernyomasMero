@@ -114,6 +114,17 @@ namespace PSZO_VernyomasMero
                             TextDecoration.WriteLineCentered("A felhasználónév nem lehet üres!", false);
                             Console.ForegroundColor = ConsoleColor.White;
                         }
+                        for (int i = 0; i < User.Users.Count; i++)
+                        {
+                            if (User.Users[i].UserName == UserName)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                TextDecoration.WriteLineCentered("Ez a felhasználónév már foglalt!", false);
+                                Console.ForegroundColor = ConsoleColor.White;
+                                UserName = "";
+                                break;
+                            }
+                        }
                     } while (string.IsNullOrWhiteSpace(UserName));
 
                     //Teljes nev
@@ -184,12 +195,19 @@ namespace PSZO_VernyomasMero
                     TextDecoration.WriteCentered("Dátum: ");
                     date = InputChecks.IsValidDate(Console.ReadLine(), true);
                     TextDecoration.WriteCentered("Szisztolés érték (Hgmm): ");
-                    int sys = int.Parse(Console.ReadLine());
+                    int sys = InputChecks.IsValidInt(Console.ReadLine(), false);
                     TextDecoration.WriteCentered("Diasztolés érték (Hgmm): ");
-                    int dia = int.Parse(Console.ReadLine());
+                    int dia = InputChecks.IsValidInt(Console.ReadLine(), false);
                     TextDecoration.WriteCentered("Pulzus (bpm): ");
-                    int pul = int.Parse(Console.ReadLine());
-                    TextDecoration.WriteLineCentered(BpStore.InspectBP(CurrentUser.BirthDate, sys, dia, pul));
+                    int pul = InputChecks.IsValidInt(Console.ReadLine(), false);
+                    string bpAnalysisdata = BpStore.InspectBP(CurrentUser.BirthDate, sys, dia, pul);
+                    string[] results = bpAnalysisdata.Split(new string[] { ", " }, StringSplitOptions.None);
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    TextDecoration.WriteLineCentered("--- KIÉRTÉKELÉS ---", false);
+                    foreach (string result in results)
+                    {
+                        TextDecoration.WriteLineCentered(result);
+                    }
                     BpStore newBpData = new BpStore(userName, date, sys, dia, pul);
                     newBpData.SaveBpData();
                 }
@@ -583,12 +601,11 @@ namespace PSZO_VernyomasMero
             /// <returns></returns>
             public static string InspectBP(DateTime birthDate, int sys, int diast, int bpm)
             {
-                // KISZÁMOLJUK AZ ÉLETKORÁT
                 int age = DateTime.Now.Year - birthDate.Year;
-                int sysMin = 0;
-                int sysMax = 0; 
-                int diastMin = 0;
-                int diastMax = 0;
+                int sysMin = 75;
+                int sysMax = 113;
+                int diastMin = 45;
+                int diastMax = 74;
                 int bpmMin = 60;
                 int bpmMax = 100;
 
@@ -596,74 +613,107 @@ namespace PSZO_VernyomasMero
                 string diastStatus = "";
                 string bpmStatus = "";
 
-                if (0 <= age && age <= 18)
+                if (age >= 18)
                 {
-                    sysMin = 75;
-                    sysMax = 113;
+                    if (sys < 90)
+                    {
+                        sysStatus = "Súlyos Hipotónia";
+                    }
+                    else if (sys < 120)
+                    {
+                        sysStatus = "Normális";
+                    }
+                    else if (sys <= 129)
+                    {
+                        sysStatus = "Emelkedett";
+                    }
+                    else if (sys <= 139)
+                    {
+                        sysStatus = "I. fokú Hipertónia";
+                    }
+                    else if (sys <= 159)
+                    {
+                        sysStatus = "II. fokú Hipertónia";
+                    }
+                    else if (sys <= 179)
+                    {
+                        sysStatus = "Súlyos Hipertónia";
+                    }
+                    else
+                    {
+                        sysStatus = "Ajánlott a korházba menni minél hamarabb";
+                    }
 
-                    diastMin = 45;
-                    diastMax = 74;
-                }
-                else if (18 < age && age >= 60)
-                {
-                    sysMin = 105;
-                    sysMax = 125;
-
-                    diastMin = 60;
-                    diastMax = 80;
+                    if (diast < 60)
+                    {
+                        diastStatus = "Súlyos Hipotónia";
+                    }
+                    else if (diast < 80)
+                    {
+                        diastStatus = "Normális";
+                    }
+                    else if (diast <= 89)
+                    {
+                        diastStatus = "I. fokú Hipertónia";
+                    }
+                    else if (diast <= 99)
+                    {
+                        diastStatus = "II. fokú Hipertónia";
+                    }
+                    else if (diast <= 109)
+                    {
+                        diastStatus = "Súlyos Hipertónia";
+                    }
+                    else
+                    {
+                        diastStatus = "Ajánlott a korházba menni minél hamarabb";
+                    }
                 }
                 else
                 {
-                    sysMin = 105;
-                    sysMax = 133;
+                    if (sys < sysMin)
+                    {
+                        sysStatus = "Alacsony";
+                    }
+                    else if (sys <= sysMax)
+                    {
+                        sysStatus = "Normális";
+                    }
+                    else
+                    {
+                        sysStatus = "Magas";
+                    }
 
-                    diastMin = 60;
-                    diastMax = 83;
+                    if (diast < diastMin)
+                    {
+                        diastStatus = "Alacsony";
+                    }
+                    else if (diast <= diastMax)
+                    {
+                        diastStatus = "Normális";
+                    }
+                    else
+                    {
+                        diastStatus = "Magas";
+                    }
+
+                    bpmMin = 60;
+                    bpmMax = 100;
                 }
 
-                // VIZSGÁLJUK A SZISZTOLIKUS ÉRTÉKET
-                if (sysMin <= sys && sys <= sysMax)
+                if (bpm < bpmMin)
                 {
-                    sysStatus = "normális";
+                    bpmStatus = "Alacsony";
                 }
-                else if (sys < sysMin)
+                else if (bpm <= bpmMax)
                 {
-                    sysStatus = "alacsony";
+                    bpmStatus = "Normális";
                 }
                 else
                 {
-                    sysStatus = "magas";
+                    bpmStatus = "Magas";
                 }
 
-                // VIZSGÁLJUK A DIASZTOLIKUS ÉRTÉKET
-                if (diastMin <= diast && diast <= diastMax)
-                {
-                    diastStatus = "normális";
-                }
-                else if (diast < diastMin)
-                {
-                    diastStatus = "alacsony";
-                }
-                else
-                {
-                    diastStatus = "magas";
-                }
-
-                // PULZUS VIZSGÁLAT
-                if (bpmMin <= bpm && bpm <= bpmMax)
-                {
-                    bpmStatus = "normális";
-                }
-                else if (bpm < bpmMin)
-                {
-                    bpmStatus = "alacsony";
-                }
-                else
-                {
-                    bpmStatus = "magas";
-                }
-
-                // SZISZTÓLIKUS_ÁLLAPOTA;DIASZTÓLIKUS_ÁLLAPOTA;PULZUS_ÁLLAPOTA
                 return $"Szisztólikus: {sysStatus}, Diasztólikus: {diastStatus}, Pulzus: {bpmStatus}";
             }
 
@@ -732,7 +782,7 @@ namespace PSZO_VernyomasMero
 
                         string status = InspectBP(birth, sys, dia, pul);
 
-                        if (!status.Contains("normális"))
+                        if (!status.Contains("Normális") || !status.Contains("normális"))
                         {
                             notNormalCount++;
                         }
@@ -1143,7 +1193,7 @@ namespace PSZO_VernyomasMero
                         return date;
                     }
                     Console.ForegroundColor = ConsoleColor.Red;
-                    TextDecoration.WriteLineCentered("Nem jól adta meg a dátumot! Írja be újra: ", false);
+                    TextDecoration.WriteCentered("Nem jól adta meg a dátumot! Írja be újra: ", false);
                     Console.ForegroundColor = ConsoleColor.White;
                     dateInput = Console.ReadLine();
                 }
@@ -1172,7 +1222,7 @@ namespace PSZO_VernyomasMero
                     while (!int.TryParse(intInput, out number) || number < minValue || number > maxValue)
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
-                        TextDecoration.WriteLineCentered($"Nem jól adta meg az értéket! Adjon meg egy számot {minValue} és {maxValue} között: ", false);
+                        TextDecoration.WriteCentered($"Nem jól adta meg az értéket! Adjon meg egy számot {minValue} és {maxValue} között: ", false);
                         Console.ForegroundColor = ConsoleColor.White;
                         intInput = Console.ReadLine();
                     }
@@ -1183,7 +1233,7 @@ namespace PSZO_VernyomasMero
                     while (!int.TryParse(intInput, out number))
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
-                        TextDecoration.WriteLineCentered("Nem jól adta meg az értéket! Adjon meg egy számot: ", false);
+                        TextDecoration.WriteCentered("Nem jól adta meg az értéket! Adjon meg egy számot: ", false);
                         Console.ForegroundColor = ConsoleColor.White;
                         intInput = Console.ReadLine();
                     }
