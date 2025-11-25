@@ -782,7 +782,7 @@ namespace PSZO_VernyomasMero
 
                         string status = InspectBP(birth, sys, dia, pul);
 
-                        if (!status.Contains("Normális") || !status.Contains("normális"))
+                        if (!status.Contains("Normális") && !status.Contains("normális"))
                         {
                             notNormalCount++;
                         }
