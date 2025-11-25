@@ -1245,7 +1245,7 @@ namespace PSZO_VernyomasMero
         /// <summary>
         /// Olyan függvényeket tartalmaz amelyek a konzol szövegek dekorálására szolgálnak
         /// </summary>
-            internal class TextDecoration
+        internal class TextDecoration
             {
                 /// <summary>
                 /// A függvény a Console.WriteLine középre íratását valósítja meg
