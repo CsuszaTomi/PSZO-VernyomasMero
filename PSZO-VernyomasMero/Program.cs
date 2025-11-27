@@ -231,6 +231,7 @@ namespace PSZO_VernyomasMero
                                     case 0:
                                         TextDecoration.WriteLineCentered("Még nem elérhető!", false);
                                         TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
+                                        Console.ReadLine(); 
                                         break;
                                     case 1:
                                         TextDecoration.WriteLineCentered("Még nem elérhető!", false);
