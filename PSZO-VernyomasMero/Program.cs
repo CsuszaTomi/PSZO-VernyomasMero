@@ -316,11 +316,11 @@ namespace PSZO_VernyomasMero
                                 switch (syschoice)
                                 {
                                     case 0:
-                                        BpStore[] sortedBpUp = BpStore.SortBpUni('s', LoginUserName, true);
+                                        BpStore[] sortedBpUp = BpStore.SortBpUni('s', LoginUserName, false);
                                         BpStore.SaveSortedBpData(LoginUserName, sortedBpUp);
                                         continue;
                                     case 1:
-                                        BpStore[] sortedBpDown = BpStore.SortBpUni('s', LoginUserName, false);
+                                        BpStore[] sortedBpDown = BpStore.SortBpUni('s', LoginUserName, true);
                                         BpStore.SaveSortedBpData(LoginUserName, sortedBpDown);
                                         continue;
                                     case 2:
@@ -332,11 +332,11 @@ namespace PSZO_VernyomasMero
                                 switch (diachoice)
                                 {
                                     case 0:
-                                        BpStore[] sortedBpUp = BpStore.SortBpUni('d', LoginUserName, true);
+                                        BpStore[] sortedBpUp = BpStore.SortBpUni('d', LoginUserName, false);
                                         BpStore.SaveSortedBpData(LoginUserName, sortedBpUp);
                                         continue;
                                     case 1:
-                                        BpStore[] sortedBpDown = BpStore.SortBpUni('d', LoginUserName, false);
+                                        BpStore[] sortedBpDown = BpStore.SortBpUni('d', LoginUserName, true);
                                         BpStore.SaveSortedBpData(LoginUserName, sortedBpDown);
                                         continue;
                                     case 2:
@@ -348,11 +348,11 @@ namespace PSZO_VernyomasMero
                                 switch (pulchoice)
                                 {
                                     case 0:
-                                        BpStore[] sortedBpUp = BpStore.SortBpUni('p', LoginUserName, true);
+                                        BpStore[] sortedBpUp = BpStore.SortBpUni('p', LoginUserName, false);
                                         BpStore.SaveSortedBpData(LoginUserName, sortedBpUp);
                                         continue;
                                     case 1:
-                                        BpStore[] sortedBpDown = BpStore.SortBpUni('p', LoginUserName, false);
+                                        BpStore[] sortedBpDown = BpStore.SortBpUni('p', LoginUserName, true);
                                         BpStore.SaveSortedBpData(LoginUserName, sortedBpDown);
                                         continue;
                                     case 2:
@@ -367,6 +367,10 @@ namespace PSZO_VernyomasMero
                         //módosítjuk az eddig mérések valamelyikét amit kiválasztunk
                         TextDecoration.WriteCentered("Add a módosítandó sorszámát(a képernyőn látható adatok sorszáma alapján ahogy most ki van írva): ");
                         string moddatainput = Console.ReadLine();
+                        if (moddatainput != null)
+                        {
+                            continue;
+                        }
                         int moddataindex = InputChecks.IsValidInt(moddatainput, true, 1, bpuserdata.Length) - 1;
                         BpStore moddata = BpStore.splitLine(bpuserdata[moddataindex]);
                         TextDecoration.WriteLineCentered("Add meg az új adatokat (ha nem szeretnéd módosítani az adott értéket, hagyd üresen és nyomj entert)");
@@ -444,7 +448,7 @@ namespace PSZO_VernyomasMero
             /// </summary>
             /// <param name="username">A menteni kivánt felhasználó neve</param>
             /// <param name="sortedData">A szortírozott paraméterek</param>
-            public static void SaveSortedBpData(string username, BpStore[] sortedData)
+            public static void SaveSortedBpData(string username, BpStore[] sortedData)  
             {
                 // FELÜLÍRJUK A RÉGI ADATOKAT AZ ÚJ, SORBA RENDEZETT ADATOKKAL
                 string basePath = AppDomain.CurrentDomain.BaseDirectory;
@@ -612,7 +616,7 @@ namespace PSZO_VernyomasMero
                 {
                     if (sortedBpDatas[i] == userBpDatas[j])
                     {
-                        userBpDatas.RemoveAt(j);
+                        userBpDatas.Remove(sortedBpDatas[i]);
                     }
                 }
             }
