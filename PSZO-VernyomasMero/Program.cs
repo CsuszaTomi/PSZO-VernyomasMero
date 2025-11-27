@@ -300,7 +300,7 @@ namespace PSZO_VernyomasMero
             bool exituserdatamenu = false;
             while (!exituserdatamenu)
             {
-                int userdatachoice = MenuControll.ArrowMenuWithTable(new string[] { "Dátum alapján rendezés", "Érték nagyság alapú rendezés", "Vissza" }, "Rendezés", () => BpStore.PrintBpTable(LoginUserName));
+                int userdatachoice = MenuControll.ArrowMenuWithTable(new string[] { "Dátum alapján rendezés", "Érték nagyság alapú rendezés","Mérés módosítása", "Vissza" }, "Rendezés", () => BpStore.PrintBpTable(LoginUserName));
                 switch (userdatachoice)
                 {
                     case 0:
@@ -364,6 +364,64 @@ namespace PSZO_VernyomasMero
                         }
                         break;
                     case 2:
+                        //módosítjuk az eddig mérések valamelyikét amit kiválasztunk
+                        TextDecoration.WriteCentered("Add a módosítandó sorszámát(a képernyőn látható adatok sorszáma alapján ahogy most ki van írva): ");
+                        string moddatainput = Console.ReadLine();
+                        int moddataindex = InputChecks.IsValidInt(moddatainput, true, 1, bpuserdata.Length) - 1;
+                        BpStore moddata = BpStore.splitLine(bpuserdata[moddataindex]);
+                        TextDecoration.WriteLineCentered("Add meg az új adatokat (ha nem szeretnéd módosítani az adott értéket, hagyd üresen és nyomj entert)");
+                        TextDecoration.WriteCentered($"Dátum ({moddata.date.ToShortDateString()}): ");
+                        string newdateinput = Console.ReadLine();
+                        if (newdateinput != "")
+                        {
+                            moddata.date = InputChecks.IsValidDate(newdateinput, true);
+                        }
+                        TextDecoration.WriteCentered($"Szisztolés érték ({moddata.sys}): ");
+                        string newsysinput = Console.ReadLine();
+                        if (newsysinput != "")
+                        {
+                            moddata.sys = InputChecks.IsValidInt(newsysinput, false);
+                        }
+                        TextDecoration.WriteCentered($"Diasztolés érték ({moddata.dia}): ");
+                        string newdiainput = Console.ReadLine();
+                        if (newdiainput != "")
+                        {
+                            moddata.dia = InputChecks.IsValidInt(newdiainput, false);
+                        }
+                        TextDecoration.WriteCentered($"Pulzus ({moddata.pulse}): ");
+                        string newpulinput = Console.ReadLine();
+                        if (newpulinput != "")
+                        {
+                            moddata.pulse = InputChecks.IsValidInt(newpulinput, false);
+                        }
+                        //mentés
+                        string basePath = AppDomain.CurrentDomain.BaseDirectory;
+                        string projectPath = Path.GetFullPath(Path.Combine(basePath, @"..\..\.."));
+                        string filePath = Path.Combine(projectPath, "BpData.txt");
+                        string[] allLines = File.ReadAllLines(filePath);
+                        for (int i = 0; i < allLines.Length; i++)
+                        {
+                            string[] parts = allLines[i].Split(';');
+                            if (parts[0] == LoginUserName)
+                            {
+                                if (moddataindex == 0)
+                                {   
+                                    allLines[i] = $"{moddata.user};{moddata.date.ToShortDateString()};{moddata.sys};{moddata.dia};{moddata.pulse}";
+                                    break;
+                                }
+                                else
+                                {
+                                    moddataindex--;
+                                }
+                            }
+                        }
+                        File.WriteAllLines(filePath, allLines);
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        TextDecoration.WriteLineCentered("Mérés módosítva!", false);
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Thread.Sleep(1000);
+                        continue;
+                    case 3:
                         exituserdatamenu = true;
                         break;
                 }
@@ -818,11 +876,11 @@ namespace PSZO_VernyomasMero
             {
                 string[] userbpdata = ReadBpData(username);
                 int maxSys = 0;
-                int minSys = 0;
+                int minSys = int.MaxValue;
                 int maxDia = 0;
-                int minDia = 0;
+                int minDia = int.MaxValue;
                 int maxPul = 0;
-                int minPul = 0;
+                int minPul = int.MaxValue;
 
                 foreach (var line in userbpdata)
                 {
