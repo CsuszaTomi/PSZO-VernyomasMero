@@ -364,10 +364,11 @@ namespace PSZO_VernyomasMero
                         }
                         break;
                     case 2:
+                        bpuserdata = BpStore.ReadBpData(LoginUserName);
                         //módosítjuk az eddig mérések valamelyikét amit kiválasztunk
                         TextDecoration.WriteCentered("Add a módosítandó sorszámát(a képernyőn látható adatok sorszáma alapján ahogy most ki van írva): ");
                         string moddatainput = Console.ReadLine();
-                        if (moddatainput != null)
+                        if (moddatainput == " ")
                         {
                             continue;
                         }
