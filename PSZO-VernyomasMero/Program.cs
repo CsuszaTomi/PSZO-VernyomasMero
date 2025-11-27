@@ -244,20 +244,32 @@ namespace PSZO_VernyomasMero
                                 Console.Clear();
                                 Console.ForegroundColor = ConsoleColor.Red;
                                 TextDecoration.WriteLineCentered("=== STATISZTIKÁK ===", false);
-                                BpStore.PrintMaxMinBpValues(LoginUserName);
-                                BpStore.PrintMaxMinBpValuesGlobal();
-                                TextDecoration.WriteCentered("Adja meg hogy milyen százaléknál nagyobb eltéréssel rendelkező felhasználókat szeretne látni (0-100): ", false);
-                                string percentinput = Console.ReadLine();
-                                if (percentinput == "")
+                                string[] userdata = BpStore.ReadBpData(LoginUserName);
+                                if (userdata.Length == 0)
                                 {
+                                    TextDecoration.WriteLineCentered("Nincs elegendő adat a statisztikák megjelenítéséhez. Kérem mérjen adatokat legalább egyszer!");
+                                    TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
+                                    Console.ReadLine();
                                     break;
                                 }
-                                int statisticchoice = InputChecks.IsValidInt(percentinput, true, 0, 100);
-                                List<string> diffusers = BpStore.GetDifferentBPUser(statisticchoice);
-                                TextDecoration.WriteLineCentered($"Felhasználók, akiknél a mérésekben a vérnyomás {statisticchoice}%-nál több esetben tér el a normálistól", false);
-                                BpStore.PrintUsersAboveCertainPercentOfDifference(diffusers);
-                                TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
-                                Console.ReadLine();
+                                else
+                                {
+                                    BpStore.GetCategoryTable(LoginUserName);
+                                    BpStore.PrintMaxMinBpValues(LoginUserName);
+                                    BpStore.PrintMaxMinBpValuesGlobal();
+                                    TextDecoration.WriteCentered("Adja meg hogy milyen százaléknál nagyobb eltéréssel rendelkező felhasználókat szeretne látni (0-100): ", false);
+                                    string percentinput = Console.ReadLine();
+                                    if (percentinput == "")
+                                    {
+                                        break;
+                                    }
+                                    int statisticchoice = InputChecks.IsValidInt(percentinput, true, 0, 100);
+                                    List<string> diffusers = BpStore.GetDifferentBPUser(statisticchoice);
+                                    TextDecoration.WriteLineCentered($"Felhasználók, akiknél a mérésekben a vérnyomás {statisticchoice}%-nál több esetben tér el a normálistól", false);
+                                    BpStore.PrintUsersAboveCertainPercentOfDifference(diffusers);
+                                    TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
+                                    Console.ReadLine();
+                                }
                                 break;
                             case 3:
                                 Console.Clear();
@@ -989,6 +1001,81 @@ namespace PSZO_VernyomasMero
                 Console.WriteLine(" ");
             }
             /// <summary>
+            /// A felhasználó méréseiből meghatározza mennyi esik a kategóriákba, majd kiírja táblázatos formában
+            /// </summary>
+            public static void GetCategoryTable(string username)
+            {
+                string[] userdata = ReadBpData(username);
+                if (userdata.Length == 0)
+                {
+                    TextDecoration.WriteLineCentered("Nincs adat");
+                    return;
+                }
+                int bigsys = 0;
+                int normsys = 0;
+                int smallsys = 0;
+                int bigdia = 0;
+                int normdia = 0;
+                int smalldia = 0;
+                int bigpul = 0;
+                int normpul = 0;
+                int smallpul = 0;
+                foreach (var line in userdata)
+                {
+                    string[] split = line.Split(';');
+                    int sys = int.Parse(split[2]);
+                    int dia = int.Parse(split[3]);
+                    int pul = int.Parse(split[4]);
+                    if (sys > 120)
+                    {
+                        bigsys++;
+                    }
+                    else if (sys >= 90)
+                    {
+                        normsys++;
+                    }
+                    else
+                    {
+                        smallsys++;
+                    }
+                    if (dia > 80)
+                    {
+                        bigdia++;
+                    }
+                    else if (dia >= 60)
+                    {
+                        normdia++;
+                    }
+                    else
+                    {
+                        smalldia++;
+                    }
+                    if (pul > 100)
+                    {
+                        bigpul++;
+                    }
+                    else if (pul >= 60)
+                    {
+                        normpul++;
+                    }
+                    else
+                    {
+                        smallpul++;
+                    }
+                }
+                Console.WriteLine(" ");
+                TextDecoration.WriteLineCentered("Mérési értékek nagysága");
+                Console.WriteLine(" ");
+                TextDecoration.WriteLineCentered("╔══════════════════════╦══════════════╦══════════════╦══════════════╗");
+                TextDecoration.WriteLineCentered("║ Érték típusa         ║   ALACSONY   ║    NORMÁL    ║    MAGAS     ║");
+                TextDecoration.WriteLineCentered("╠══════════════════════╬══════════════╬══════════════╬══════════════╣");
+                TextDecoration.WriteLineCentered($"║ Szisztolés érték     ║ {smallsys.ToString().PadLeft(6)}       ║ {normsys.ToString().PadLeft(6)}       ║ {bigsys.ToString().PadLeft(6)}       ║");
+                TextDecoration.WriteLineCentered($"║ Diasztolés érték     ║ {smalldia.ToString().PadLeft(6)}       ║ {normdia.ToString().PadLeft(6)}       ║ {bigdia.ToString().PadLeft(6)}       ║");
+                TextDecoration.WriteLineCentered($"║ Pulzus érték         ║ {smallpul.ToString().PadLeft(6)}       ║ {normpul.ToString().PadLeft(6)}       ║ {bigpul.ToString().PadLeft(6)}       ║");
+                TextDecoration.WriteLineCentered("╚══════════════════════╩══════════════╩══════════════╩══════════════╝");
+                Console.WriteLine(" ");
+            }
+            /// <summary>
             /// Kiírja a megadott felhasználó nevét, akiknek a mérések bizonyos százalékban eltérnek a normálistól
             /// </summary>
             /// <param name="username"></param>
@@ -1011,6 +1098,7 @@ namespace PSZO_VernyomasMero
                 }
                 TextDecoration.WriteLineCentered("╚══════════════════╝");
             }
+
 
 
             /// <summary>
