@@ -13,6 +13,7 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using static PSZO_VernyomasMero.Program;
 
 namespace PSZO_VernyomasMero
@@ -113,6 +114,17 @@ namespace PSZO_VernyomasMero
                             TextDecoration.WriteLineCentered("A felhasználónév nem lehet üres!", false);
                             Console.ForegroundColor = ConsoleColor.White;
                         }
+                        for (int i = 0; i < User.Users.Count; i++)
+                        {
+                            if (User.Users[i].UserName == UserName)
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                TextDecoration.WriteLineCentered("Ez a felhasználónév már foglalt!", false);
+                                Console.ForegroundColor = ConsoleColor.White;
+                                UserName = "";
+                                break;
+                            }
+                        }
                     } while (string.IsNullOrWhiteSpace(UserName));
 
                     //Teljes nev
@@ -183,12 +195,19 @@ namespace PSZO_VernyomasMero
                     TextDecoration.WriteCentered("Dátum: ");
                     date = InputChecks.IsValidDate(Console.ReadLine(), true);
                     TextDecoration.WriteCentered("Szisztolés érték (Hgmm): ");
-                    int sys = int.Parse(Console.ReadLine());
+                    int sys = InputChecks.IsValidInt(Console.ReadLine(), false);
                     TextDecoration.WriteCentered("Diasztolés érték (Hgmm): ");
-                    int dia = int.Parse(Console.ReadLine());
+                    int dia = InputChecks.IsValidInt(Console.ReadLine(), false);
                     TextDecoration.WriteCentered("Pulzus (bpm): ");
-                    int pul = int.Parse(Console.ReadLine());
-                    TextDecoration.WriteLineCentered(BpStore.InspectBP(CurrentUser.BirthDate, sys, dia, pul));
+                    int pul = InputChecks.IsValidInt(Console.ReadLine(), false);
+                    string bpAnalysisdata = BpStore.InspectBP(CurrentUser.BirthDate, sys, dia, pul);
+                    string[] results = bpAnalysisdata.Split(new string[] { ", " }, StringSplitOptions.None);
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    TextDecoration.WriteLineCentered("--- KIÉRTÉKELÉS ---", false);
+                    foreach (string result in results)
+                    {
+                        TextDecoration.WriteLineCentered(result);
+                    }
                     BpStore newBpData = new BpStore(userName, date, sys, dia, pul);
                     newBpData.SaveBpData();
                 }
@@ -219,27 +238,7 @@ namespace PSZO_VernyomasMero
                                 Console.ReadLine();
                                 break;
                             case 1:
-                                Console.Clear();
-                                string[] bpuserdata = BpStore.ReadBpData(LoginUserName);
-                                Console.ForegroundColor = ConsoleColor.Red;
-                                TextDecoration.WriteLineCentered("=== SAJÁT MÉRÉSEK ===", false);
-                                Console.WriteLine(" ");
-                                BpStore.PrintBpTable(LoginUserName);
-                                int userdatachoice = MenuControll.ArrowMenuWithTable(new string[] { "Dátom alapján rendezés", "Érték nagyság alapú rendezés","Vissza" }, "Rendezés", () => BpStore.PrintBpTable(LoginUserName));
-                                switch(userdatachoice)
-                                {
-                                    case 0:
-                                        TextDecoration.WriteLineCentered("Még nem elérhető!", false);
-                                        TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
-                                        Console.ReadLine(); 
-                                        break;
-                                    case 1:
-                                        TextDecoration.WriteLineCentered("Még nem elérhető!", false);
-                                        TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
-                                        break;
-                                    case 2:
-                                        break;
-                                }
+                                UserData(LoginUserName);
                                 break;
                             case 2:
                                 Console.Clear();
@@ -247,12 +246,16 @@ namespace PSZO_VernyomasMero
                                 TextDecoration.WriteLineCentered("=== STATISZTIKÁK ===", false);
                                 BpStore.PrintMaxMinBpValues(LoginUserName);
                                 BpStore.PrintMaxMinBpValuesGlobal();
-                                List<string> diffusers = BpStore.GetDifferentBPUser(30);
-                                TextDecoration.WriteLineCentered("Felhasználók, akiknél nagyobb mint 30% eltérés van:");
-                                foreach (var user in diffusers)
+                                TextDecoration.WriteCentered("Adja meg hogy milyen százaléknál nagyobb eltéréssel rendelkező felhasználókat szeretne látni (0-100): ", false);
+                                string percentinput = Console.ReadLine();
+                                if (percentinput == "")
                                 {
-                                    TextDecoration.WriteLineCentered(user);
+                                    break;
                                 }
+                                int statisticchoice = InputChecks.IsValidInt(percentinput, true, 0, 100);
+                                List<string> diffusers = BpStore.GetDifferentBPUser(statisticchoice);
+                                TextDecoration.WriteLineCentered($"Felhasználók, akiknél a mérésekben a vérnyomás {statisticchoice}%-nál több esetben tér el a normálistól", false);
+                                BpStore.PrintUsersAboveCertainPercentOfDifference(diffusers);
                                 TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
                                 Console.ReadLine();
                                 break;
@@ -274,6 +277,87 @@ namespace PSZO_VernyomasMero
             }
         }
 
+        private static void UserData(string LoginUserName)
+        {
+            Console.Clear();
+            string[] bpuserdata = BpStore.ReadBpData(LoginUserName);
+            Console.ForegroundColor = ConsoleColor.Red;
+            TextDecoration.WriteLineCentered("=== SAJÁT MÉRÉSEK ===", false);
+            Console.WriteLine(" ");
+            BpStore.PrintBpTable(LoginUserName);
+            bool exituserdatamenu = false;
+            while (!exituserdatamenu)
+            {
+                int userdatachoice = MenuControll.ArrowMenuWithTable(new string[] { "Dátum alapján rendezés", "Érték nagyság alapú rendezés", "Vissza" }, "Rendezés", () => BpStore.PrintBpTable(LoginUserName));
+                switch (userdatachoice)
+                {
+                    case 0:
+                        BpStore[] sortedDateBp = BpStore.SortBpUni('t', LoginUserName, true);
+                        BpStore.SaveSortedBpData(LoginUserName, sortedDateBp);
+                        continue;
+                    case 1:
+                        int valuesortchoice = MenuControll.ArrowMenuWithTable(new string[] { "Szisztolés alapú", "Diasztolés alapú", "Pulzus alapú", "Vissza" }, "Rendezés", () => BpStore.PrintBpTable(LoginUserName));
+                        switch (valuesortchoice)
+                        {
+                            case 0:
+                                int syschoice = MenuControll.ArrowMenuWithTable(new string[] { "Növekvő", "Csökkenő", "Vissza" }, "Szisztolés alapú Rendezés", () => BpStore.PrintBpTable(LoginUserName));
+                                switch (syschoice)
+                                {
+                                    case 0:
+                                        BpStore[] sortedBpUp = BpStore.SortBpUni('s', LoginUserName, true);
+                                        BpStore.SaveSortedBpData(LoginUserName, sortedBpUp);
+                                        continue;
+                                    case 1:
+                                        BpStore[] sortedBpDown = BpStore.SortBpUni('s', LoginUserName, false);
+                                        BpStore.SaveSortedBpData(LoginUserName, sortedBpDown);
+                                        continue;
+                                    case 2:
+                                        continue;
+                                }
+                                continue;
+                            case 1:
+                                int diachoice = MenuControll.ArrowMenuWithTable(new string[] { "Növekvő", "Csökkenő", "Vissza" }, "Diasztolés alapú Rendezés", () => BpStore.PrintBpTable(LoginUserName));
+                                switch (diachoice)
+                                {
+                                    case 0:
+                                        BpStore[] sortedBpUp = BpStore.SortBpUni('d', LoginUserName, true);
+                                        BpStore.SaveSortedBpData(LoginUserName, sortedBpUp);
+                                        continue;
+                                    case 1:
+                                        BpStore[] sortedBpDown = BpStore.SortBpUni('d', LoginUserName, false);
+                                        BpStore.SaveSortedBpData(LoginUserName, sortedBpDown);
+                                        continue;
+                                    case 2:
+                                        continue;
+                                }
+                                continue;
+                            case 2:
+                                int pulchoice = MenuControll.ArrowMenuWithTable(new string[] { "Növekvő", "Csökkenő", "Vissza" }, "Pulzus alapú Rendezés", () => BpStore.PrintBpTable(LoginUserName));
+                                switch (pulchoice)
+                                {
+                                    case 0:
+                                        BpStore[] sortedBpUp = BpStore.SortBpUni('p', LoginUserName, true);
+                                        BpStore.SaveSortedBpData(LoginUserName, sortedBpUp);
+                                        continue;
+                                    case 1:
+                                        BpStore[] sortedBpDown = BpStore.SortBpUni('p', LoginUserName, false);
+                                        BpStore.SaveSortedBpData(LoginUserName, sortedBpDown);
+                                        continue;
+                                    case 2:
+                                        continue;
+                                }
+                                continue;
+                            case 3:
+                                continue;
+                        }
+                        break;
+                    case 2:
+                        exituserdatamenu = true;
+                        break;
+                }
+            }
+        }
+
         /// <summary>
         /// A VÉRNYOMÁS ADATAIT TÁROLJA(MÉRÉS IDEJE,EREDMÉNYE, qANY)
         /// </summary>
@@ -284,6 +368,184 @@ namespace PSZO_VernyomasMero
             public int sys;
             public int dia;
             public int pulse;
+
+            /// <summary>
+            /// Szortírozott vérnyomás adatok fájlba mentése
+            /// </summary>
+            /// <param name="username">A menteni kivánt felhasználó neve</param>
+            /// <param name="sortedData">A szortírozott paraméterek</param>
+            public static void SaveSortedBpData(string username, BpStore[] sortedData)
+            {
+                // FELÜLÍRJUK A RÉGI ADATOKAT AZ ÚJ, SORBA RENDEZETT ADATOKKAL
+                string basePath = AppDomain.CurrentDomain.BaseDirectory;
+                string projectPath = Path.GetFullPath(Path.Combine(basePath, @"..\..\.."));
+                string filePath = Path.Combine(projectPath, "BpData.txt");
+                // BEOLVASÁS
+                List<string> allLines = File.ReadAllLines(filePath).ToList();
+                List<string> filtered = new List<string>();
+                foreach (string line in allLines)
+                {
+                    string[] parts = line.Split(';');
+                    string lineUser = parts[0];
+                    if (lineUser != username)
+                    {
+                        filtered.Add(line);
+                    }
+                }
+                allLines = filtered;
+                foreach (var bp in sortedData)
+                {
+                    allLines.Add($"{bp.user};{bp.date.ToShortDateString()};{bp.sys};{bp.dia};{bp.pulse}");
+                }
+                File.WriteAllLines(filePath, allLines);
+            }
+            public static BpStore splitLine(string line)
+            {
+                string[] lineSplit = line.Split(';');
+
+                return new BpStore(lineSplit[0], DateTime.Parse(lineSplit[1]), int.Parse(lineSplit[2]), int.Parse(lineSplit[3]), int.Parse(lineSplit[4]));
+            }
+
+
+        public static BpStore MinFind(string username, List<BpStore> BpArray, char mode)
+        {
+            BpStore min = BpArray[0];
+
+                for (int i = 0; i < BpArray.Count; i++)
+                {
+                    if (mode == 't')
+                    {
+                        if (BpArray[i].date < min.date)
+                        {
+                            min = BpArray[i];
+                        }
+                    }
+                    else if (mode == 's')
+                    {
+                        if (BpArray[i].sys < min.sys)
+                        {
+                            min = BpArray[i];
+                        }
+                    }
+                    else if (mode == 'd')
+                    {
+                        if (BpArray[i].dia < min.dia)
+                        {
+                            min = BpArray[i];
+                        }
+                    }
+                    else if (mode == 'p')
+                    {
+                        if (BpArray[i].pulse < min.pulse)
+                        {
+                            min = BpArray[i];
+                        }
+                    }
+                }
+
+                return min;
+            }
+
+        public static BpStore MaxFind(string username, List<BpStore> BpArray, char mode)
+        {
+            BpStore max = BpArray[0];
+
+                for (int i = 0; i < BpArray.Count; i++)
+                {
+                    if (mode == 't')
+                    {
+                        if (BpArray[i].date > max.date)
+                        {
+                            max = BpArray[i];
+                        }
+                    }
+                    else if (mode == 's')
+                    {
+                        if (BpArray[i].sys > max.sys)
+                        {
+                            max = BpArray[i];
+                        }
+                    }
+                    else if (mode == 'd')
+                    {
+                        if (BpArray[i].dia > max.dia)
+                        {
+                            max = BpArray[i];
+                        }
+                    }
+                    else if (mode == 'p')
+                    {
+                        if (BpArray[i].pulse > max.pulse)
+                        {
+                            max = BpArray[i];
+                        }
+                    }
+                }
+
+                // Console.WriteLine(max.date);
+
+                return max;
+            }
+
+        /// <summary>
+        /// SORBA RENDEZI A MEGADOTT FELHASZNÁLÓ ADATAIT A KÉRT ADAT SZERINT (DÁTUM // SZISZTOLIKUS, DIASZTOLIKUS, VAGY PULZUS ÉRTÉKE SZERINT) [A mode paraméterben választhatja ki a kért adatot (később részletezve lesz)]
+        /// </summary>
+        /// <param name="mode">A PARAMÉTER AMI SZERINT A SORBA RENDEZÉS TÖRTÉNIK t: dátum szerint; d: diasztolikus érték szerint; s: szisztolikus érték szerint; p: pulzus szerint</param>
+        /// <param name="username">FELHASZNÁLÓ FELHASZNÁLÓNEVE AKINÉL A SORBARENDEZÉSNEK TÖRTÉNNIE KELL</param>
+        /// <param name="asc">NÖVEKVŐ SORREND ENGEDÉLYEZÉSE: false(alapértelmezett) -> csökkenő; true -> növekvő</param>
+        /// <returns></returns>
+        public static BpStore[] SortBpUni(char mode, string username, bool asc = false)
+        {
+            string[] userBpDataRaw = BpStore.ReadBpData(username);
+
+                List<BpStore> userBpDatas = new List<BpStore> { };
+                BpStore[] sortedBpDatas = new BpStore[userBpDataRaw.Length];
+
+                BpStore bpData = new BpStore();
+
+                for (int i = 0; i < userBpDataRaw.Length; i++)
+                {
+                    bpData = new BpStore(userBpDataRaw[i]);
+
+                    userBpDatas.Add(bpData);
+                }
+
+            if (asc)
+            {
+                for (int i = 0; i < userBpDataRaw.Length; i++)
+                {
+                    sortedBpDatas[i] = MaxFind(username, userBpDatas, mode);
+
+                        // Console.WriteLine(sortedBpDatas[i].date);
+
+                    RemoveObjectFromList(userBpDatas, sortedBpDatas, i);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < userBpDataRaw.Length; i++)
+                {
+                    sortedBpDatas[i] = MinFind(username, userBpDatas, mode);
+
+                        // Console.WriteLine(sortedBpDatas[i].date);
+
+                        RemoveObjectFromList(userBpDatas, sortedBpDatas, i);
+                    }
+                }
+
+                return sortedBpDatas;
+            }
+
+            private static void RemoveObjectFromList(List<BpStore> userBpDatas, BpStore[] sortedBpDatas, int i)
+            {
+                for (int j = 0; j < userBpDatas.Count; j++)
+                {
+                    if (sortedBpDatas[i] == userBpDatas[j])
+                    {
+                        userBpDatas.RemoveAt(j);
+                    }
+                }
+            }
 
             /// <summary>
             /// Vérnyomás adatainak fájlba mentése
@@ -312,6 +574,23 @@ namespace PSZO_VernyomasMero
                 this.dia = dia;
                 this.pulse = pulse;
             }
+
+            public BpStore(string line)
+            {
+                string[] lineSplit = line.Split(';');
+
+                this.user = lineSplit[0];
+                this.date = DateTime.Parse(lineSplit[1]);
+                this.sys = int.Parse(lineSplit[2]);
+                this.dia = int.Parse(lineSplit[3]);
+                this.pulse = int.Parse(lineSplit[4]);
+            }
+
+            public BpStore()
+            {
+
+            }
+
             /// <summary>
             /// Vérnyomás értékek vizsgálata és állapot visszaadása
             /// </summary>
@@ -320,15 +599,13 @@ namespace PSZO_VernyomasMero
             /// <param name="diast"></param>
             /// <param name="bpm"></param>
             /// <returns></returns>
-
             public static string InspectBP(DateTime birthDate, int sys, int diast, int bpm)
             {
-                // KISZÁMOLJUK AZ ÉLETKORÁT
                 int age = DateTime.Now.Year - birthDate.Year;
-                int sysMin = 0;
-                int sysMax = 0; 
-                int diastMin = 0;
-                int diastMax = 0;
+                int sysMin = 75;
+                int sysMax = 113;
+                int diastMin = 45;
+                int diastMax = 74;
                 int bpmMin = 60;
                 int bpmMax = 100;
 
@@ -336,74 +613,107 @@ namespace PSZO_VernyomasMero
                 string diastStatus = "";
                 string bpmStatus = "";
 
-                if (0 <= age && age <= 18)
+                if (age >= 18)
                 {
-                    sysMin = 75;
-                    sysMax = 113;
+                    if (sys < 90)
+                    {
+                        sysStatus = "Súlyos Hipotónia";
+                    }
+                    else if (sys < 120)
+                    {
+                        sysStatus = "Normális";
+                    }
+                    else if (sys <= 129)
+                    {
+                        sysStatus = "Emelkedett";
+                    }
+                    else if (sys <= 139)
+                    {
+                        sysStatus = "I. fokú Hipertónia";
+                    }
+                    else if (sys <= 159)
+                    {
+                        sysStatus = "II. fokú Hipertónia";
+                    }
+                    else if (sys <= 179)
+                    {
+                        sysStatus = "Súlyos Hipertónia";
+                    }
+                    else
+                    {
+                        sysStatus = "Ajánlott a korházba menni minél hamarabb";
+                    }
 
-                    diastMin = 45;
-                    diastMax = 74;
-                }
-                else if (18 < age && age >= 60)
-                {
-                    sysMin = 105;
-                    sysMax = 125;
-
-                    diastMin = 60;
-                    diastMax = 80;
+                    if (diast < 60)
+                    {
+                        diastStatus = "Súlyos Hipotónia";
+                    }
+                    else if (diast < 80)
+                    {
+                        diastStatus = "Normális";
+                    }
+                    else if (diast <= 89)
+                    {
+                        diastStatus = "I. fokú Hipertónia";
+                    }
+                    else if (diast <= 99)
+                    {
+                        diastStatus = "II. fokú Hipertónia";
+                    }
+                    else if (diast <= 109)
+                    {
+                        diastStatus = "Súlyos Hipertónia";
+                    }
+                    else
+                    {
+                        diastStatus = "Ajánlott a korházba menni minél hamarabb";
+                    }
                 }
                 else
                 {
-                    sysMin = 105;
-                    sysMax = 133;
+                    if (sys < sysMin)
+                    {
+                        sysStatus = "Alacsony";
+                    }
+                    else if (sys <= sysMax)
+                    {
+                        sysStatus = "Normális";
+                    }
+                    else
+                    {
+                        sysStatus = "Magas";
+                    }
 
-                    diastMin = 60;
-                    diastMax = 83;
+                    if (diast < diastMin)
+                    {
+                        diastStatus = "Alacsony";
+                    }
+                    else if (diast <= diastMax)
+                    {
+                        diastStatus = "Normális";
+                    }
+                    else
+                    {
+                        diastStatus = "Magas";
+                    }
+
+                    bpmMin = 60;
+                    bpmMax = 100;
                 }
 
-                // VIZSGÁLJUK A SZISZTOLIKUS ÉRTÉKET
-                if (sysMin <= sys && sys <= sysMax)
+                if (bpm < bpmMin)
                 {
-                    sysStatus = "normális";
+                    bpmStatus = "Alacsony";
                 }
-                else if (sys < sysMin)
+                else if (bpm <= bpmMax)
                 {
-                    sysStatus = "alacsony";
+                    bpmStatus = "Normális";
                 }
                 else
                 {
-                    sysStatus = "magas";
+                    bpmStatus = "Magas";
                 }
 
-                // VIZSGÁLJUK A DIASZTOLIKUS ÉRTÉKET
-                if (diastMin <= diast && diast <= diastMax)
-                {
-                    diastStatus = "normális";
-                }
-                else if (diast < diastMin)
-                {
-                    diastStatus = "alacsony";
-                }
-                else
-                {
-                    diastStatus = "magas";
-                }
-
-                // PULZUS VIZSGÁLAT
-                if (bpmMin <= bpm && bpm <= bpmMax)
-                {
-                    bpmStatus = "normális";
-                }
-                else if (bpm < bpmMin)
-                {
-                    bpmStatus = "alacsony";
-                }
-                else
-                {
-                    bpmStatus = "magas";
-                }
-
-                // SZISZTÓLIKUS_ÁLLAPOTA;DIASZTÓLIKUS_ÁLLAPOTA;PULZUS_ÁLLAPOTA
                 return $"Szisztólikus: {sysStatus}, Diasztólikus: {diastStatus}, Pulzus: {bpmStatus}";
             }
 
@@ -445,52 +755,45 @@ namespace PSZO_VernyomasMero
             /// Visszaadja azon felhasználók listáját, akiknél a mérések meghatározott százaléka eltér a normálistól.
             /// </summary>
             /// <param name="maxDiff">A megengedett maximum eltérés százalékban</param>
-            /// <returns>Felhasználónevek listája</returns>
-            public static List<string> GetDifferentBPUser(double maxDiff)
+            /// <returns>Felhasználónevek listája</returns> 
+            public static List<string> GetDifferentBPUser(double limitPercent)
             {
-                int diffNum = 0;
-
-                double diffPercent = 0;
-
-                string[] users = User.GetUserNames();
-                string[] cUserData = { };
-                string[] lineSplit = { };
-                string[] inspected = { };
-
-                List<string> diffUsers = new List<string> { };
-
-                foreach (string user in users)
+                List<string> diffUsers = new List<string>();
+                string[] allUsers = User.GetUserNames();
+                foreach (string user in allUsers)
                 {
-                    cUserData = BpStore.ReadBpData(user);
-                    diffNum = 0;
-
-                    if (cUserData.Length != 0)
+                    string[] bpLines = ReadBpData(user);
+                    string currentUser = user;
+                    if (bpLines.Length == 0)
                     {
-                        foreach (string line in cUserData)
+                        continue;
+                    }
+                    int notNormalCount = 0;
+                    foreach (string line in bpLines)
+                    {
+                        var parts = line.Split(';');
+                        string u = parts[0];
+                        DateTime date = DateTime.Parse(parts[1]);
+                        int sys = int.Parse(parts[2]);
+                        int dia = int.Parse(parts[3]);
+                        int pul = int.Parse(parts[4]);
+
+                        DateTime birth = User.Get(currentUser).BirthDate;
+
+                        string status = InspectBP(birth, sys, dia, pul);
+
+                        if (!status.Contains("Normális") && !status.Contains("normális"))
                         {
-                            lineSplit = line.Split(';');
-
-                            inspected = BpStore.InspectBP(DateTime.Parse(lineSplit[1]), int.Parse(lineSplit[2]), int.Parse(lineSplit[3]), int.Parse(lineSplit[4])).Split(';');
-
-
-                            if (lineSplit[0] == user)
-                            {
-                                if (inspected[0] != "normális" || inspected[1] != "normális" || inspected[2] != "normális")
-                                {
-                                    diffNum++;
-                                }
-                            }
-                        }
-
-                        diffPercent = (double)diffNum / cUserData.Length * 100;
-
-                        if (diffPercent < maxDiff || diffPercent > maxDiff)
-                        {
-                            diffUsers.Add(user);
+                            notNormalCount++;
                         }
                     }
-                }
+                    double percent = (double)notNormalCount / bpLines.Length * 100.0;
 
+                    if (percent >= limitPercent)
+                    {
+                        diffUsers.Add(user);
+                    }
+                }
                 return diffUsers;
             }
 
@@ -550,61 +853,31 @@ namespace PSZO_VernyomasMero
             public static int[] GetMaxMinBpValuesGlobal()
             {
                 string[] users = User.GetUserNames();
-                int AverageMaxSys = 0;
-                int AverageMinSys = 0;
-                int AverageMaxDia = 0;
-                int AverageMinDia = 0;
-                int AverageMaxPul = 0;
-                int AverageMinPul = 0;
+                int maxSys = int.MinValue;
+                int minSys = int.MaxValue;
+                int maxDia = int.MinValue;
+                int minDia = int.MaxValue;
+                int maxPul = int.MinValue;
+                int minPul = int.MaxValue;
 
                 foreach (var user in users)
                 {
                     string[] userbpdata = ReadBpData(user);
-                    int maxSys = 0;
-                    int minSys = 0;
-                    int maxDia = 0;
-                    int minDia = 0;
-                    int maxPul = 0;
-                    int minPul = 0;
                     foreach (var line in userbpdata)
                     {
                         string[] split = line.Split(';');
                         int sys = int.Parse(split[2]);
                         int dia = int.Parse(split[3]);
                         int pul = int.Parse(split[4]);
-                        if (sys > maxSys)
-                        {
-                            maxSys = sys;
-                        }
-                        if (sys < minSys || minSys == 0)
-                        {
-                            minSys = sys;
-                        }
-                        if (dia > maxDia)
-                        {
-                            maxDia = dia;
-                        }
-                        if (dia < minDia || minDia == 0)
-                        {
-                            minDia = dia;
-                        }
-                        if (pul > maxPul)
-                        {
-                            maxPul = pul;
-                        }
-                        if (pul < minPul || minPul == 0)
-                        {
-                            minPul = pul;
-                        }
-                        AverageMaxDia += maxDia;
-                        AverageMinDia += minDia;
-                        AverageMaxSys += maxSys;
-                        AverageMinSys += minSys;
-                        AverageMaxPul += maxPul;
-                        AverageMinPul += minPul;
+                        maxSys = Math.Max(maxSys, sys);
+                        minSys = Math.Min(minSys, sys);
+                        maxDia = Math.Max(maxDia, dia);
+                        minDia = Math.Min(minDia, dia);
+                        maxPul = Math.Max(maxPul, pul);
+                        minPul = Math.Min(minPul, pul);
                     }
                 }
-                return new int[] { AverageMaxSys/users.Length, AverageMinSys/users.Length, AverageMaxDia/ users.Length, AverageMinDia/ users.Length, AverageMaxPul/ users.Length, AverageMinPul/ users.Length };
+                return new int[] {maxSys,minSys,maxDia,minDia,maxPul,minPul };
             }
             /// <summary>
             /// Visszaadja a globális átlagos vérnyomás értékeket
@@ -659,7 +932,10 @@ namespace PSZO_VernyomasMero
                 }
                 TextDecoration.WriteLineCentered("╚══════════════════╩═══════╩═══════╩═══════╝");
             }
-
+            /// <summary>
+            /// Kiírja a megadott felhasználó személyes maximum és minimum vérnyomás értékeit
+            /// </summary>
+            /// <param name="username"></param>
             public static void PrintMaxMinBpValues(string username)
             {
                 int[] minmax = GetMaxMinBpValues(username);
@@ -684,7 +960,9 @@ namespace PSZO_VernyomasMero
                 TextDecoration.WriteLineCentered($"║ Pulzus érték     ║ {minPul.ToString().PadLeft(6)} ║ {maxPul.ToString().PadLeft(6)} ║{avgpul.ToString().PadLeft(6)} ║");
                 TextDecoration.WriteLineCentered("╚══════════════════╩════════╩════════╩═══════╝");
             }
-
+            /// <summary>
+            /// Kiírja a globális maximum és minimum vérnyomás értékeket
+            /// </summary>
             public static void PrintMaxMinBpValuesGlobal()
             {
                 int[] minmax = GetMaxMinBpValuesGlobal();
@@ -710,10 +988,33 @@ namespace PSZO_VernyomasMero
                 TextDecoration.WriteLineCentered("╚══════════════════╩════════╩════════╩════════╝");
                 Console.WriteLine(" ");
             }
+            /// <summary>
+            /// Kiírja a megadott felhasználó nevét, akiknek a mérések bizonyos százalékban eltérnek a normálistól
+            /// </summary>
+            /// <param name="username"></param>
+            public static void PrintUsersAboveCertainPercentOfDifference(List<string> diffusers)
+            {
+                if (diffusers.Count == 0)
+                {
+                    TextDecoration.WriteLineCentered("Nincs adat");
+                    return;
+                }
+                TextDecoration.WriteLineCentered("╔══════════════════╗");
+                TextDecoration.WriteLineCentered("║ Felhasználó név  ║");
+                TextDecoration.WriteLineCentered("╠══════════════════╣");
+                foreach (var line in diffusers)
+                {
+                    string[] split = line.Split(';');
+                    string name = split[0];
+                    string centered = TextDecoration.CenterText(name, 17);
+                    TextDecoration.WriteLineCentered($"║{centered} ║");
+                }
+                TextDecoration.WriteLineCentered("╚══════════════════╝");
+            }
 
 
             /// <summary>
-            /// 
+            /// Felhasználói vérnyomásadatok beolvasása
             /// </summary>
             /// <param name="userName"></param>
             /// <returns></returns>
@@ -795,7 +1096,19 @@ namespace PSZO_VernyomasMero
                     Users.Add(NewUser);
                 }
             }
-            
+
+            public static User Get(string username)
+            {
+                foreach (var user in Users)
+                {
+                    if (user.UserName == username)
+                    {
+                        return user;
+                    }
+                }
+                return null;
+            }
+
             /// <summary>
             /// Felhasználók felsorolása
             /// </summary>
@@ -880,11 +1193,52 @@ namespace PSZO_VernyomasMero
                         return date;
                     }
                     Console.ForegroundColor = ConsoleColor.Red;
-                    TextDecoration.WriteLineCentered("Nem jól adta meg a dátumot! Írja be újra: ", false);
+                    TextDecoration.WriteCentered("Nem jól adta meg a dátumot! Írja be újra: ", false);
                     Console.ForegroundColor = ConsoleColor.White;
                     dateInput = Console.ReadLine();
                 }
                 return date;
+            }
+
+            /// <summary>
+            /// Egy szöveges bemenet érvényesítése és egésszé alakítása, opcionálisan megadott tartományon belüli ellenőrzéssel.
+            /// </summary>
+            /// <remarks>
+            /// Ha a <paramref name="betweenvalues"/> értéke <see langword="true"/>, akkor a függvény
+            /// addig kéri újra a felhasználótól a bemenetet, amíg egy érvényes, a megadott tartományba eső egész számot nem ad.
+            /// Ha a <paramref name="betweenvalues"/> értéke <see langword="false"/>, akkor addig kéri újra a bemenetet,
+            /// amíg egy érvényes egész számot nem ad.
+            /// </remarks>
+            /// <param name="intInput">A szöveges bemenet, amelynek érvényességét ellenőrizzük és amelyet egésszé alakítunk.</param>
+            /// <param name="betweenvalues">Jelzi, hogy a bemenetet egy megadott értéktartományon belül is ellenőrizni kell-e.</param>
+            /// <param name="minValue">A minimális érték, ha a <paramref name="betweenvalues"/> értéke <see langword="true"/>.</param>
+            /// <param name="maxValue">A maximális érték, ha a <paramref name="betweenvalues"/> értéke <see langword="true"/>.</param>
+            /// <returns>Az érvényesített egész szám. Ha a <paramref name="betweenvalues"/> értéke <see langword="true"/>, akkor az érték a <paramref name="minValue"/> és <paramref name="maxValue"/> közé fog esni.</returns>
+            public static int IsValidInt(string intInput, bool betweenvalues = false, int minValue = 0, int maxValue = 0)
+            {
+                int number;
+                if (betweenvalues)
+                {
+                    while (!int.TryParse(intInput, out number) || number < minValue || number > maxValue)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        TextDecoration.WriteCentered($"Nem jól adta meg az értéket! Adjon meg egy számot {minValue} és {maxValue} között: ", false);
+                        Console.ForegroundColor = ConsoleColor.White;
+                        intInput = Console.ReadLine();
+                    }
+                    return number;
+                }
+                else//ha nem 2 érték között kell lennie hanem csak simán számnak
+                {
+                    while (!int.TryParse(intInput, out number))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        TextDecoration.WriteCentered("Nem jól adta meg az értéket! Adjon meg egy számot: ", false);
+                        Console.ForegroundColor = ConsoleColor.White;
+                        intInput = Console.ReadLine();
+                    }
+                    return number;
+                }
             }
 
         }
@@ -892,53 +1246,64 @@ namespace PSZO_VernyomasMero
         /// Olyan függvényeket tartalmaz amelyek a konzol szövegek dekorálására szolgálnak
         /// </summary>
         internal class TextDecoration
-        {
-            /// <summary>
-            /// A függvény a Console.WriteLine középre íratását valósítja meg
-            /// </summary>
-            /// <param name="text">A megadott szöveget írja ki középre</param>
-            /// <param name="changeColor">Igaz érték esetén megváltoztatja a konzol betűszínét a beállításoknak megfelelően</param>
-            public static void WriteLineCentered(string text, bool changeColor = true)
-            // Console.WriteLine középre íratása
             {
-                int width = Console.WindowWidth;
-                int leftPadding = (width - text.Length) / 2;
-                if (leftPadding < 0)
+                /// <summary>
+                /// A függvény a Console.WriteLine középre íratását valósítja meg
+                /// </summary>
+                /// <param name="text">A megadott szöveget írja ki középre</param>
+                /// <param name="changeColor">Igaz érték esetén megváltoztatja a konzol betűszínét a beállításoknak megfelelően</param>
+                public static void WriteLineCentered(string text, bool changeColor = true)
+                // Console.WriteLine középre íratása
                 {
-                    leftPadding = 0;
+                    int width = Console.WindowWidth;
+                    int leftPadding = (width - text.Length) / 2;
+                    if (leftPadding < 0)
+                    {
+                        leftPadding = 0;
+                    }
+                    if (changeColor)
+                    {
+                        Settings.ChangeConsoleColors();
+                    }
+                    Console.WriteLine(new string(' ', leftPadding) + text);
                 }
-                if (changeColor)
+                public static void WriteCentered(string text, bool changeColor = true)
+                // Console.Write középre íratása
                 {
-                    Settings.ChangeConsoleColors();
+                    int width = Console.WindowWidth;
+                    int leftPadding = (width - text.Length) / 2;
+                    if (leftPadding < 0)
+                    {
+                        leftPadding = 0;
+                    }
+                    if (changeColor)
+                    {
+                        Settings.ChangeConsoleColors();
+                    }
+                    Console.Write(new string(' ', leftPadding) + text);
                 }
-                Console.WriteLine(new string(' ', leftPadding) + text);
-            }
-            public static void WriteCentered(string text, bool changeColor = true)
-            // Console.Write középre íratása
-            {
-                int width = Console.WindowWidth;
-                int leftPadding = (width - text.Length) / 2;
-                if (leftPadding < 0)
+                public static void LoadingAnimation(string message = "Mentés folyamatban", int durationMs = 1500)
                 {
-                    leftPadding = 0;
+                    WriteCentered($"{message}");
+                    int steps = 5;
+                    for (int i = 0; i < steps; i++)
+                    {
+                        Console.Write(".");
+                        Thread.Sleep(durationMs / steps);
+                    }
+                    Console.Write("Kész");
                 }
-                if (changeColor)
+
+                public static string CenterText(string text, int width)
                 {
-                    Settings.ChangeConsoleColors();
+                    if (text.Length > width)
+                        text = text.Substring(0, width);
+
+                    int left = (width - text.Length) / 2;
+                    int right = width - text.Length - left;
+
+                    return new string(' ', left) + text + new string(' ', right);
                 }
-                Console.Write(new string(' ', leftPadding) + text);
-            }
-            public static void LoadingAnimation(string message = "Mentés folyamatban", int durationMs = 1500)
-            {
-                WriteCentered($"{message}");
-                int steps = 5;
-                for (int i = 0; i < steps; i++)
-                {
-                    Console.Write(".");
-                    Thread.Sleep(durationMs / steps);
-                }
-                Console.Write("Kész");
-            }
 
         }
         /// <summary>
@@ -953,7 +1318,7 @@ namespace PSZO_VernyomasMero
             /// <returns></returns>
             public static void SettingsMenu()
             {
-                int settingchoose = MenuControll.ArrowMenu(new string[] { "Téma kiválasztása","Program beállítások", "Fiók beállítások", "Vissza"}, "=== BEÁLLÍTÁSOK ===");
+                int settingchoose = MenuControll.ArrowMenu(new string[] { "Téma kiválasztása", "Vissza"}, "=== BEÁLLÍTÁSOK ===");
                 switch (settingchoose)
                 {
                     case 0:
@@ -978,22 +1343,6 @@ namespace PSZO_VernyomasMero
                         }
                         break;
                     case 1:
-                        {
-                            Console.Clear();
-                            TextDecoration.WriteLineCentered("Nincsenek elérhető program beállítások!", false);
-                            TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
-                            Console.ReadLine();
-                            break;
-                        }
-                    case 2:
-                        {
-                            Console.Clear();
-                            TextDecoration.WriteLineCentered("Nincsenek elérhető fiók beállítások!", false);
-                            TextDecoration.WriteLineCentered("Nyomjon ENTER-t a folytatáshoz...");
-                            Console.ReadLine();
-                            break;
-                        }
-                    case 3:
                         break;
                 }
             }
